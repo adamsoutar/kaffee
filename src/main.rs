@@ -18,12 +18,20 @@ fn print_token (tk: &Token) {
         },
         Token::Operator(op) => {
             println!("Operator: {}", op)
+        },
+        Token::Punctuation(pnc) => {
+            println!("Punctuation: {}", pnc)
         }
     }
 }
 
 fn main() {
-    let code = String::from(" 3.14 hello let x = \"Hello, world!\"");
+    let code = String::from("
+        let code = \"Hello, world!\"
+        const object = {
+            a: \"Hi\"
+        }
+    ");
     let mut tokens = tokeniser::new(code);
 
     while !tokens.eof {

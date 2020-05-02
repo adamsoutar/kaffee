@@ -4,7 +4,8 @@ pub enum Token {
     Identifier(String),
     Keyword(String),
     Number(f64),
-    Operator(String)
+    Operator(String),
+    Punctuation(char)
 }
 
 // TODO: Don't redefine the vectors in each
@@ -46,6 +47,10 @@ pub fn is_operator(s: &String) -> bool {
 // Characters may be part of an operator, but not operators themselves
 pub fn is_operator_char (c: &char) -> bool {
     in_char_string(c, "=!+-/*")
+}
+
+pub fn is_punctuation(c: &char) -> bool {
+    in_char_string(c, ":,.()[]{}")
 }
 
 pub fn is_identifier(c: &char) -> bool {

@@ -34,6 +34,10 @@ impl Tokeniser {
             self.current = self.read_identifier();
         } else if is_operator_char(&c) {
             self.current = self.read_operator();
+        } else if is_punctuation(&c) {
+            // Punctuation is just one char, doesn't need a
+            // read method
+            self.current = Token::Punctuation(self.code.read())
         } else {
             panic!("Invalid syntax - unexpected character {} in code", c);
         }
