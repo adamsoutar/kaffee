@@ -43,6 +43,12 @@ pub fn is_operator(s: &String) -> bool {
         "!="
     ])
 }
+pub fn is_assignment_operator (s: &String) -> bool {
+    // TODO: *=, +=, -=, etc.
+    in_string_vector(s, vec![
+        "="
+    ])
+}
 
 // Characters may be part of an operator, but not operators themselves
 pub fn is_operator_char (c: &char) -> bool {
