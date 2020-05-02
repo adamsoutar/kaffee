@@ -1,6 +1,7 @@
 pub struct CharStream {
     pub code: Vec<char>,
-    pub index: usize
+    pub index: usize,
+    pub eof: bool
 }
 
 impl CharStream {
@@ -10,7 +11,15 @@ impl CharStream {
 
     pub fn read (&mut self) -> char {
         let c = self.code[self.index];
-        self.index += 1;
+
+        if self.index >= self.code.len() - 1 {
+            self.eof = true;
+            // Continually reads the final char once eof
+            self.index -= 1;
+        } else {
+            self.index += 1;
+        }
+
         c
     }
 }
@@ -18,6 +27,7 @@ impl CharStream {
 pub fn new (code: String) -> CharStream {
     CharStream {
         code: code.chars().collect(),
-        index: 0
+        index: 0,
+        eof: false
     }
 }

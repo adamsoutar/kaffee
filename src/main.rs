@@ -20,12 +20,11 @@ fn print_token (tk: &Token) {
 }
 
 fn main() {
-    let code = String::from(" 3.14 \"Hello, world!\" 71 hello let ");
+    let code = String::from(" 3.14 hello let x \"Hello, world!\"");
     let mut tokens = tokeniser::new(code);
 
-    print_token(&tokens.read());
-    print_token(&tokens.read());
-    print_token(&tokens.read());
-    print_token(&tokens.read());
-    print_token(tokens.peek());
+    while !tokens.eof {
+        let tk = tokens.read();
+        print_token(&tk);
+    }
 }

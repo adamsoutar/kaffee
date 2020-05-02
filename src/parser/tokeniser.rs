@@ -5,18 +5,24 @@ use std::iter::FromIterator;
 
 pub struct Tokeniser {
     pub code: CharStream,
-    pub current: Token
+    pub current: Token,
+    pub eof: bool
 }
 
 impl Tokeniser {
     fn eat_whitespace (&mut self) {
-        while is_whitespace(&self.code.peek()) {
+        while !self.code.eof && is_whitespace(&self.code.peek()) {
             self.code.read();
         }
     }
 
     fn read_next (&mut self) {
         self.eat_whitespace();
+
+        if self.code.eof {
+            self.eof = true;
+            return;
+        }
 
         let c = self.code.peek();
 
@@ -26,12 +32,14 @@ impl Tokeniser {
             self.current = self.read_string();
         } else if is_identifier_start(&c) {
             self.current = self.read_identifier();
+        } else {
+            panic!("Invalid syntax - unexpected character {} in code", c);
         }
     }
 
     fn read_identifier (&mut self) -> Token {
         let mut ident = vec![];
-        while is_identifier(&self.code.peek()) {
+        while !self.code.eof && is_identifier(&self.code.peek()) {
             ident.push(self.code.read());
         }
         let st = String::from_iter(ident);
@@ -46,7 +54,7 @@ impl Tokeniser {
         self.code.read();
         let mut chars = vec![];
         // TODO: Escapes and EOF
-        while self.code.peek() != '"' {
+        while !self.code.eof && self.code.peek() != '"' {
             chars.push(self.code.read());
         }
         self.code.read();
@@ -55,7 +63,7 @@ impl Tokeniser {
 
     fn read_number (&mut self) -> Token {
         let mut vc = vec![];
-        while is_number(&self.code.peek()) {
+        while !self.code.eof && is_number(&self.code.peek()) {
             vc.push(self.code.read())
         }
         let st = String::from_iter(vc);
@@ -77,7 +85,8 @@ pub fn new (code: String) -> Tokeniser {
     let cs = char_stream::new(code);
     let mut tk = Tokeniser {
         code: cs,
-        current: Token::Number(0.)
+        current: Token::Number(0.),
+        eof: false
     };
     tk.read_next();
     tk
