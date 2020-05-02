@@ -3,11 +3,22 @@ pub enum Token {
     String(String),
     Identifier(String),
     Keyword(String),
-    Number(f64)
+    Number(f64),
+    Operator(String)
 }
 
 // TODO: Don't redefine the vectors in each
 //       is_ function.
+
+fn in_string_vector (s: &String, v: Vec<&str>) -> bool {
+    let vs: Vec<String> = v.into_iter().map(|x| x.to_owned()).collect();
+    vs.contains(s)
+}
+
+fn in_char_string (c: &char, s: &str) -> bool {
+    let x: Vec<char> = s.chars().collect();
+    x.contains(c)
+}
 
 pub fn is_whitespace (c: &char) -> bool {
     let whitespace = vec![' ', '\t', '\n', ';'];
@@ -20,20 +31,27 @@ pub fn is_number(c: &char) -> bool {
 }
 
 pub fn is_keyword(s: &String) -> bool {
-    let keywords: Vec<String> = vec![
+    in_string_vector(s, vec![
         "let", "const"
-    ].into_iter().map(|x| x.to_owned()).collect();
-    keywords.contains(s)
+    ])
+}
+
+pub fn is_operator(s: &String) -> bool {
+    in_string_vector(s, vec![
+        "=", "==", "+", "-", "*", "/",
+        "!="
+    ])
+}
+
+// Characters may be part of an operator, but not operators themselves
+pub fn is_operator_char (c: &char) -> bool {
+    in_char_string(c, "=!+-/*")
 }
 
 pub fn is_identifier(c: &char) -> bool {
-    let chars: Vec<char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_"
-        .chars().collect();
-    chars.contains(c)
+    in_char_string(c, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789$_")
 }
 
 pub fn is_identifier_start(c: &char) -> bool {
-    let chars: Vec<char> = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_"
-        .chars().collect();
-    chars.contains(c)
+    in_char_string(c, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ$_")
 }

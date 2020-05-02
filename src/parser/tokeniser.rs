@@ -32,9 +32,25 @@ impl Tokeniser {
             self.current = self.read_string();
         } else if is_identifier_start(&c) {
             self.current = self.read_identifier();
+        } else if is_operator_char(&c) {
+            self.current = self.read_operator();
         } else {
             panic!("Invalid syntax - unexpected character {} in code", c);
         }
+    }
+
+    fn read_operator (&mut self) -> Token {
+        let mut op = vec![];
+        while !self.code.eof && is_operator_char(&self.code.peek()) {
+            op.push(self.code.read());
+        }
+        let st = String::from_iter(op);
+
+        if !is_operator(&st) {
+            panic!("\"{}\" is not a valid operator", st)
+        }
+
+        Token::Operator(st)
     }
 
     fn read_identifier (&mut self) -> Token {

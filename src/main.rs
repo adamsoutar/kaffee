@@ -15,12 +15,15 @@ fn print_token (tk: &Token) {
         },
         Token::Identifier(id) => {
             println!("Identifier: {}", id)
+        },
+        Token::Operator(op) => {
+            println!("Operator: {}", op)
         }
     }
 }
 
 fn main() {
-    let code = String::from(" 3.14 hello let x \"Hello, world!\"");
+    let code = String::from(" 3.14 hello let x = \"Hello, world!\"");
     let mut tokens = tokeniser::new(code);
 
     while !tokens.eof {
