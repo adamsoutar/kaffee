@@ -1,3 +1,6 @@
+// TODO: Remove the need for these to be clonable
+//       it's done quite infrequently.
+
 #[derive(Clone)]
 pub enum ASTNode {
     String(String),

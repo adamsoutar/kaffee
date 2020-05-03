@@ -230,14 +230,14 @@ impl Parser {
         let mut node = self.parse_atom(accept_statements);
 
         loop {
-            let (wasAcc, accNode) = self.might_be_property_access(node.clone());
-            let (wasCall, callNode) = self.might_be_call(accNode);
+            let (was_acc, acc_node) = self.might_be_property_access(node.clone());
+            let (was_call, call_node) = self.might_be_call(acc_node);
 
-            if !(wasAcc || wasCall) {
+            if !(was_acc || was_call) {
                 break;
             }
 
-            node = callNode;
+            node = call_node;
         }
 
         let mba = self.might_be_assignment(node);
