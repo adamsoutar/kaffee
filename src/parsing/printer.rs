@@ -1,6 +1,30 @@
 // Prints the AST for debug
 // not, like... inkjet.
 use crate::parsing::ast_utils::*;
+use crate::parsing::tokens::*;
+
+pub fn print_token (tk: &Token) {
+    match tk {
+        Token::Number(nm) => {
+            println!("Number: {}", nm)
+        },
+        Token::String(st) => {
+            println!("String: \"{}\"", st)
+        },
+        Token::Keyword(kw) => {
+            println!("Keyword: {}", kw)
+        },
+        Token::Identifier(id) => {
+            println!("Identifier: {}", id)
+        },
+        Token::Operator(op) => {
+            println!("Operator: {}", op)
+        },
+        Token::Punctuation(pnc) => {
+            println!("Punctuation: {}", pnc)
+        }
+    }
+}
 
 fn print_at_depth (s: String, depth: i32) {
     let mut str = String::from("");
@@ -61,7 +85,6 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
             print_at_depth(String::from("Binary node:"), depth);
             print_binary(&bn, depth + 1);
         }
-        _ => print_at_depth(String::from("Unknown node type"), depth)
     }
 }
 

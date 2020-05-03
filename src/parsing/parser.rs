@@ -9,29 +9,6 @@ pub struct Parser {
     pub tokens: Tokeniser
 }
 
-fn print_token (tk: &Token) {
-    match tk {
-        Token::Number(nm) => {
-            println!("Number: {}", nm)
-        },
-        Token::String(st) => {
-            println!("String: \"{}\"", st)
-        },
-        Token::Keyword(kw) => {
-            println!("Keyword: {}", kw)
-        },
-        Token::Identifier(id) => {
-            println!("Identifier: {}", id)
-        },
-        Token::Operator(op) => {
-            println!("Operator: {}", op)
-        },
-        Token::Punctuation(pnc) => {
-            println!("Punctuation: {}", pnc)
-        }
-    }
-}
-
 // NOTE: There is more implementation than this!
 //       Little methods like expect_punctuation()
 //       are in parser_helpers.rs
@@ -42,7 +19,7 @@ impl Parser {
         if let Token::Punctuation(pnc) = t {
             // Bracketed expressions
             if pnc == '(' {
-                let exp = self.parse_component(true);
+                let exp = self.parse_component(true, 0);
                 self.expect_punctuation(')');
                 return exp;
             }
@@ -120,7 +97,7 @@ impl Parser {
                 } else {
                     // Explicit key/value { a: b }
                     self.expect_punctuation(':');
-                    values.push(self.parse_component(false));
+                    values.push(self.parse_component(false, 0));
 
                     let nt = self.tokens.read();
                     if let Token::Punctuation(pnc) = nt {
@@ -146,7 +123,7 @@ impl Parser {
     }
 
     fn parse_variable_declaration (&mut self, constant: bool) -> ASTNode {
-        let nxt = self.parse_component(false);
+        let nxt = self.parse_component(false, 0);
 
         match nxt {
             ASTNode::Assignment(assignment) => {
@@ -172,7 +149,7 @@ impl Parser {
                 return ASTNode::Assignment(BinaryProperties {
                     left: Box::new(me),
                     operator: op.clone(),
-                    right: Box::new(self.parse_component(false))
+                    right: Box::new(self.parse_component(false, 0))
                 })
             }
         }
@@ -190,7 +167,7 @@ impl Parser {
                 if their_prec > my_precedence {
                     self.tokens.read();
 
-                    let them = self.parse_component(false);
+                    let them = self.parse_component(false, their_prec);
 
                     let node = ASTNode::BinaryNode(BinaryProperties {
                         left: Box::new(me),
@@ -206,11 +183,11 @@ impl Parser {
         me
     }
 
-    fn parse_component (&mut self, accept_statements: bool) -> ASTNode {
+    fn parse_component (&mut self, accept_statements: bool, prec: i32) -> ASTNode {
         // TODO: Property access and function calls
         let node = self.parse_atom(accept_statements);
         let mba = self.might_be_assignment(node);
-        self.might_be_binary(mba, 0)
+        self.might_be_binary(mba, prec)
     }
 
     fn parse_block_statement (&mut self, expect_first_brace: bool, expect_last_brace: bool) -> ASTNode {
@@ -220,7 +197,7 @@ impl Parser {
 
         let mut statements = vec![];
         while !self.tokens.eof {
-            statements.push(self.parse_component(true))
+            statements.push(self.parse_component(true, 0))
         }
 
         if expect_last_brace {
