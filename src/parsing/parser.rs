@@ -68,11 +68,7 @@ impl Parser {
 
             if let Token::Punctuation(pnc) = t {
                 if pnc == '{' {
-                    // TODO: Parse object literal
-                    return ASTNode::ObjectLiteral(ObjectLiteralProperties {
-                        keys: vec![],
-                        values: vec![]
-                    })
+                    return self.parse_object_literal();
                 }
             }
 
@@ -98,7 +94,55 @@ impl Parser {
             }
         }
 
-        panic!("As-yet unsupported statement token")
+        panic!("Unsupported syntax")
+    }
+
+    fn parse_object_literal (&mut self) -> ASTNode {
+        let mut keys = vec![];
+        let mut values = vec![];
+
+        while !self.tokens.eof {
+            let t = self.tokens.read();
+
+            if let Token::Identifier(id) = t {
+                keys.push(id.clone());
+
+                if self.is_next_punctuation(',') ||
+                   self.is_next_punctuation('}') {
+                    // This is an implicit key/value { a, b, c }
+                    values.push(ASTNode::Identifier(id));
+                    if self.is_next_punctuation('}') {
+                        self.tokens.read();
+                        break;
+                    }
+                    self.tokens.read();
+                    continue;
+                } else {
+                    // Explicit key/value { a: b }
+                    self.expect_punctuation(':');
+                    values.push(self.parse_component(false));
+
+                    let nt = self.tokens.read();
+                    if let Token::Punctuation(pnc) = nt {
+                        if pnc == '}' {
+                            break
+                        } else if pnc == ',' {
+                            continue
+                        }
+                    }
+
+                    panic!("Invalid token after value in object literal.")
+                }
+            } else {
+                panic!("Object keys should be identifiers
+(or you left a dangling comma { a, })")
+            }
+        }
+
+        ASTNode::ObjectLiteral(ObjectLiteralProperties{
+            keys,
+            values
+        })
     }
 
     fn parse_variable_declaration (&mut self, constant: bool) -> ASTNode {
