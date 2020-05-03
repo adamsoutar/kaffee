@@ -38,6 +38,7 @@ pub fn is_keyword(s: &String) -> bool {
 }
 
 pub fn is_operator(s: &String) -> bool {
+    // TODO: Exponentiation operator
     in_string_vector(s, vec![
         "=", "==", "+", "-", "*", "/",
         "!="
@@ -48,6 +49,24 @@ pub fn is_assignment_operator (s: &String) -> bool {
     in_string_vector(s, vec![
         "="
     ])
+}
+pub fn is_binary_operator (s: &String) -> bool {
+    in_string_vector(s, vec![
+        "+", "-", "*", "/", "==",
+        "!="
+    ])
+}
+pub fn get_operator_precedence (s: &String) -> i32 {
+    let sstr = &s[..];
+    match sstr {
+        "+" => 13,
+        "-" => 13,
+        "*" => 14,
+        "/" => 14,
+        "==" => 10,
+        "!=" => 10,
+        _ => 0
+    }
 }
 
 // Characters may be part of an operator, but not operators themselves

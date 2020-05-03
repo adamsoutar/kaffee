@@ -125,7 +125,7 @@ impl Parser {
             if is_assignment_operator(&op) {
                 self.tokens.read();
 
-                ASTNode::Assignment(AssignmentProperties{
+                ASTNode::Assignment(BinaryProperties {
                     left: Box::new(me),
                     operator: op.clone(),
                     right: Box::new(self.parse_component(false))
@@ -134,10 +134,35 @@ impl Parser {
         } else { me }
     }
 
+    fn might_be_binary (&mut self, me: ASTNode, my_precedence: i32) -> ASTNode {
+        let t = self.tokens.peek().clone();
+
+        if let Token::Operator(op) = t {
+            if is_binary_operator(&op) {
+                let their_prec = get_operator_precedence(&op);
+
+                if their_prec > my_precedence {
+                    self.tokens.read();
+
+                    let them = self.parse_component(false);
+
+                    let node = ASTNode::BinaryNode(BinaryProperties {
+                        left: Box::new(me),
+                        operator: op,
+                        right: Box::new(them)
+                    });
+
+                    self.might_be_binary(node, my_precedence)
+                } else { me }
+            } else { me }
+        } else { me }
+    }
+
     fn parse_component (&mut self, accept_statements: bool) -> ASTNode {
-        // TODO
+        // TODO: Property access and function calls
         let node = self.parse_atom(accept_statements);
-        self.might_be_assignment(node)
+        let mba = self.might_be_assignment(node);
+        self.might_be_binary(mba, 0)
     }
 
     fn parse_block_statement (&mut self, expect_first_brace: bool, expect_last_brace: bool) -> ASTNode {

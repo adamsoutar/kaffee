@@ -4,8 +4,9 @@ pub enum ASTNode {
     Identifier(String),
     ObjectLiteral(ObjectLiteralProperties),
     BlockStatement(Vec<ASTNode>),
-    Assignment(AssignmentProperties),
-    Declaration(DeclarationProperties)
+    Assignment(BinaryProperties),
+    Declaration(DeclarationProperties),
+    BinaryNode(BinaryProperties)
 }
 
 pub struct ObjectLiteralProperties {
@@ -13,7 +14,7 @@ pub struct ObjectLiteralProperties {
     pub values: Vec<ASTNode>
 }
 
-pub struct AssignmentProperties {
+pub struct BinaryProperties {
     pub left: Box<ASTNode>,
     pub operator: String,
     pub right: Box<ASTNode>
@@ -21,5 +22,5 @@ pub struct AssignmentProperties {
 
 pub struct DeclarationProperties {
     pub constant: bool,
-    pub assignment: AssignmentProperties
+    pub assignment: BinaryProperties
 }
