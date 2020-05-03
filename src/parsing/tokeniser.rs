@@ -3,6 +3,8 @@ use crate::parsing::char_stream::CharStream;
 use crate::parsing::tokens::*;
 use std::iter::FromIterator;
 
+// TODO: Comments
+
 // Tokeniser acts like a stream
 pub struct Tokeniser {
     pub code: CharStream,
