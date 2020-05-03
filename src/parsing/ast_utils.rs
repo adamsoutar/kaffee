@@ -31,6 +31,8 @@ pub struct BinaryProperties {
 #[derive(Clone)]
 pub struct DeclarationProperties {
     pub constant: bool,
+    // TODO: Panic if declaration binary doesn't use =
+    //       and/or the left isn't an identifier
     pub assignment: BinaryProperties
 }
 
