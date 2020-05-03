@@ -27,9 +27,9 @@ impl Tokeniser {
 
         let c = self.code.peek();
 
-        if is_number(&c) {
-            self.current = self.read_number();
-        } else if c == '"' {
+        // TODO: Fix reading of numbers like .5 as properties
+        //       See https://github.com/adamsoutar/ajs/blob/d392fcd388a5cb3e044a7fcd32534d7b816520a7/parser/tokeniser.go#L108
+        if c == '"' {
             self.current = self.read_string();
         } else if is_identifier_start(&c) {
             self.current = self.read_identifier();
@@ -39,6 +39,8 @@ impl Tokeniser {
             // Punctuation is just one char, doesn't need a
             // read method
             self.current = Token::Punctuation(self.code.read())
+        } else if is_number(&c) {
+            self.current = self.read_number();
         } else {
             panic!("Invalid syntax - unexpected character {} in code", c);
         }

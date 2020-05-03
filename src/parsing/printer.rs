@@ -84,6 +84,22 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
         ASTNode::BinaryNode(bn) => {
             print_at_depth(String::from("Binary node:"), depth);
             print_binary(&bn, depth + 1);
+        },
+        ASTNode::FunctionCall(fnc) => {
+            print_at_depth(String::from("Function call:"), depth);
+            print_at_depth(String::from("Callee:"), depth + 1);
+            print_ast_node(fnc.callee.as_ref(), depth + 2);
+            print_at_depth(String::from("Args:"), depth + 1);
+            for arg in &fnc.args {
+                print_ast_node(arg, depth + 2);
+            }
+        },
+        ASTNode::PropertyAccess(prp) => {
+            print_at_depth(String::from("Property access:"), depth);
+            print_at_depth(String::from("Object:"), depth + 1);
+            print_ast_node(prp.object.as_ref(), depth + 2);
+            print_at_depth(String::from("Property:"), depth + 1);
+            print_ast_node(prp.property.as_ref(), depth + 2);
         }
     }
 }

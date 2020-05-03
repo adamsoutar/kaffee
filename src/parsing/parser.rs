@@ -138,6 +138,25 @@ impl Parser {
         }
     }
 
+    fn parse_delimited (&mut self, start: char, delim: char, end: char) -> Vec<ASTNode> {
+        self.expect_punctuation(start);
+
+        let mut args = vec![];
+        loop {
+            args.push(self.parse_component(false, 0));
+
+            if !self.is_next_punctuation(delim) {
+                break;
+            }
+
+            // Read the delim char
+            self.tokens.read();
+        }
+
+        self.expect_punctuation(end);
+        return args;
+    }
+
     fn might_be_assignment (&mut self, me: ASTNode) -> ASTNode {
         // The clone is to prevent a mutable/immutable borrow
         let t = self.tokens.peek().clone();
@@ -183,9 +202,44 @@ impl Parser {
         me
     }
 
+    fn might_be_call (&mut self, node: ASTNode) -> (bool, ASTNode) {
+        if self.is_next_punctuation('(') {
+            let args = self.parse_delimited('(', ',', ')');
+            return (true, ASTNode::FunctionCall(CallProperties {
+                callee: Box::new(node),
+                args
+            }))
+        }
+
+        (false, node)
+    }
+
+    fn might_be_property_access (&mut self, node: ASTNode) -> (bool, ASTNode) {
+        if self.is_next_punctuation('.') {
+            self.tokens.read();
+            return (true, ASTNode::PropertyAccess(AccessProperties {
+                object: Box::new(node),
+                property: Box::new(self.parse_atom(false))
+            }))
+        }
+
+        (false, node)
+    }
+
     fn parse_component (&mut self, accept_statements: bool, prec: i32) -> ASTNode {
-        // TODO: Property access and function calls
-        let node = self.parse_atom(accept_statements);
+        let mut node = self.parse_atom(accept_statements);
+
+        loop {
+            let (wasAcc, accNode) = self.might_be_property_access(node.clone());
+            let (wasCall, callNode) = self.might_be_call(accNode);
+
+            if !(wasAcc || wasCall) {
+                break;
+            }
+
+            node = callNode;
+        }
+
         let mba = self.might_be_assignment(node);
         self.might_be_binary(mba, prec)
     }

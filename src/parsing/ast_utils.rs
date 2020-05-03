@@ -7,7 +7,9 @@ pub enum ASTNode {
     BlockStatement(Vec<ASTNode>),
     Assignment(BinaryProperties),
     Declaration(DeclarationProperties),
-    BinaryNode(BinaryProperties)
+    BinaryNode(BinaryProperties),
+    FunctionCall(CallProperties),
+    PropertyAccess(AccessProperties)
 }
 
 #[derive(Clone)]
@@ -27,4 +29,16 @@ pub struct BinaryProperties {
 pub struct DeclarationProperties {
     pub constant: bool,
     pub assignment: BinaryProperties
+}
+
+#[derive(Clone)]
+pub struct CallProperties {
+    pub callee: Box<ASTNode>,
+    pub args: Vec<ASTNode>
+}
+
+#[derive(Clone)]
+pub struct AccessProperties {
+    pub object: Box<ASTNode>,
+    pub property: Box<ASTNode>
 }
