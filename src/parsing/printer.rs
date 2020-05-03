@@ -104,8 +104,8 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
     }
 }
 
-pub fn print_ast (ast: Vec<ASTNode>) {
+pub fn print_ast (ast: &Vec<ASTNode>) {
     for node in ast {
-        print_ast_node(&node, 0);
+        print_ast_node(node, 0);
     }
 }

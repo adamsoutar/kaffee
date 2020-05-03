@@ -1,13 +1,13 @@
 mod parsing;
-use parsing::parser;
+mod interpretting;
+use interpretting::interpreter;
 use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
         let n = 1
     ");
-    let mut ps = parser::new(code);
-    let ast = ps.generate_ast();
-
-    print_ast(ast);
+    let mut interp = interpreter::new(code);
+    print_ast(&interp.ast);
+    interp.run();
 }
