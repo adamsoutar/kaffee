@@ -50,6 +50,16 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
         },
         ASTNode::ObjectLiteral(obj) => {
             print_object_literal(&obj, depth);
+        },
+        ASTNode::BlockStatement(bs) => {
+            print_at_depth(String::from("Block statement:"), depth);
+            for stmt in bs {
+                print_ast_node(stmt, depth + 1);
+            }
+        },
+        ASTNode::BinaryNode(bn) => {
+            print_at_depth(String::from("Binary node:"), depth);
+            print_binary(&bn, depth + 1);
         }
         _ => print_at_depth(String::from("Unknown node type"), depth)
     }

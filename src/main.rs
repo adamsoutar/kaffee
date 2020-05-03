@@ -9,6 +9,8 @@ fn main() {
             age: 17,
             code
         }
+
+        let n = 3 * 5 + 2
     ");
     let mut ps = parser::new(code);
     let ast = ps.generate_ast();
