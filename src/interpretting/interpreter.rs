@@ -71,10 +71,34 @@ impl Interpreter {
             ASTNode::String(st) => KaffeeValue::String(st.clone()),
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),
             ASTNode::Identifier(id) => self.vars.resolve_identifier(id).clone(),
+            ASTNode::BinaryNode(bn) => self.resolve_binary(&bn),
             _ => panic!("Unresolvable ASTNode value")
         }
     }
 
+    fn resolve_binary (&mut self, bn: &BinaryProperties) -> KaffeeValue {
+        let lft = self.resolve_node(bn.left.as_ref());
+        let rgt = self.resolve_node(bn.right.as_ref());
+
+        let ln = self.assert_number(&lft);
+        let rn = self.assert_number(&rgt);
+
+        KaffeeValue::Number(match &bn.operator[..] {
+            "+" => ln + rn,
+            "-" => ln - rn,
+            "/" => ln / rn,
+            "*" => ln * rn,
+            _ => panic!("Invalid operator in binary node")
+        })
+    }
+
+    fn assert_number (&mut self, kv: &KaffeeValue) -> f64 {
+        if let KaffeeValue::Number(n) = kv {
+            n.clone()
+        } else {
+            panic!("Non-number used where one was expected.")
+        }
+    }
 }
 
 pub fn new (code: String) -> Interpreter {
