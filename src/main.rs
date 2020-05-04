@@ -6,11 +6,9 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let myPrint = println
-        const name = \"Adam\"
-
-        println(\"My name is:\")
-        myPrint(name)
+        function greet (greeting, name) {
+            let n = 1
+        }
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

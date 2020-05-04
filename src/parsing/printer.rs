@@ -100,6 +100,17 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
             print_ast_node(prp.object.as_ref(), depth + 2);
             print_at_depth(String::from("Property:"), depth + 1);
             print_ast_node(prp.property.as_ref(), depth + 2);
+        },
+        ASTNode::FunctionDefinition(fd) => {
+            print_at_depth(format!("Function definition - \"{}\":", fd.name), depth);
+            print_at_depth(String::from("Args:"), depth + 1);
+            for arg in &fd.args {
+                print_at_depth(format!("{}", arg), depth + 2)
+            }
+            print_at_depth(String::from("Body:"), depth + 1);
+            for node in &fd.body {
+                print_ast_node(node, depth + 2)
+            }
         }
     }
 }

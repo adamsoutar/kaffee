@@ -1,6 +1,3 @@
-// TODO: Remove the need for these to be clonable
-//       it's done quite infrequently.
-
 #[derive(Clone)]
 pub enum ASTNode {
     String(String),
@@ -12,7 +9,15 @@ pub enum ASTNode {
     Declaration(DeclarationProperties),
     BinaryNode(BinaryProperties),
     FunctionCall(CallProperties),
+    FunctionDefinition(FunctionDefinitionProperties),
     PropertyAccess(AccessProperties)
+}
+
+#[derive(Clone)]
+pub struct FunctionDefinitionProperties {
+    pub name: String,
+    pub args: Vec<String>,
+    pub body: Vec<ASTNode>
 }
 
 #[derive(Clone)]

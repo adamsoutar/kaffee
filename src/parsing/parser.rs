@@ -58,7 +58,9 @@ impl Parser {
     }
 
     fn parse_statement (&mut self, t: Token) -> ASTNode {
+        println!("Parsing statement");
         if let Token::Keyword(kw) = t {
+            println!("{}", kw);
             let kwstr = &kw[..];
             match kwstr {
                 "let" => {
@@ -67,11 +69,40 @@ impl Parser {
                 "const" => {
                     return self.parse_variable_declaration(true)
                 },
+                "function" => {
+                    return self.parse_function_definition()
+                },
                 _ => {}
             }
         }
 
         panic!("Unsupported syntax")
+    }
+
+    fn parse_function_definition (&mut self) -> ASTNode {
+        let name_ident = &self.parse_atom(false);
+        let name = self.ident_as_string(name_ident);
+
+        let args = self.parse_delimited('(', ',', ')')
+            .iter().map(|x| self.ident_as_string(x)).collect();
+
+        let body_block = self.parse_block_statement(true, true);
+
+        if let ASTNode::BlockStatement(body) = body_block {
+            ASTNode::FunctionDefinition(FunctionDefinitionProperties {
+                name, args, body
+            })
+        } else {
+            unreachable!()
+        }
+    }
+
+    fn ident_as_string (&mut self, ident: &ASTNode) -> String {
+        if let ASTNode::Identifier(name) = ident {
+            name.clone()
+        } else {
+            panic!("Expected identifier.");
+        }
     }
 
     fn parse_object_literal (&mut self) -> ASTNode {
@@ -251,7 +282,11 @@ impl Parser {
 
         let mut statements = vec![];
         while !self.tokens.eof {
-            statements.push(self.parse_component(true, 0))
+            statements.push(self.parse_component(true, 0));
+
+            if expect_last_brace && self.is_next_punctuation('}') {
+                break
+            }
         }
 
         if expect_last_brace {
