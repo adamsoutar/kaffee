@@ -39,6 +39,7 @@ pub struct NativeMapping {
 
 #[derive(Clone)]
 pub struct ObjectValue {
-    pub keys: Vec<AllocedValue>,
-    pub values: Vec<AllocedValue>
+    pub keys: Vec<usize>,
+    // Indexes into alloced
+    pub values: Vec<usize>
 }

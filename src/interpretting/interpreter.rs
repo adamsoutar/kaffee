@@ -23,6 +23,9 @@ impl Interpreter {
         // Put funcs like println in the global scope
         self.load_std_lib();
 
+        // User global scope is above std_lib global scope
+        self.vars.new_scope();
+
         for i in 0..self.ast.len() {
             let node = self.ast[i].clone();
             self.eval_node(&node)
@@ -30,6 +33,7 @@ impl Interpreter {
 
         println!("\nAllocced values:");
         self.vars.print_allocced();
+        println!("");
         self.vars.print_scopestack();
     }
 
@@ -70,9 +74,28 @@ impl Interpreter {
         if let KaffeeValue::NativeFunction(nf) = callee {
             let rargs = cp.args.iter().map(|x| self.resolve_node(x)).collect();
             (nf.func)(rargs)
+        } else if let KaffeeValue::Function(f) = callee {
+            self.eval_userfn_call(cp, &f)
         } else {
-            panic!("Calling anything but a NativeFunction is not yet supported.")
+            panic!("Called an uncallable value, eg. 3.14()");
         }
+    }
+
+    fn eval_userfn_call (&mut self, cp: &CallProperties, fd: &FunctionDefinition) {
+        self.vars.new_scope();
+
+        // Allocate arguments to the block scope
+        for i in 0..fd.args.len() {
+            let val = self.resolve_node(&cp.args[i]);
+            self.vars.alloc_in_scope(&fd.args[i], val, false);
+        }
+
+        for node in &fd.body {
+            self.eval_node(node);
+        }
+
+        // TODO: Garbage collection
+        self.vars.pop_scope();
     }
 
     fn assign_variable (&mut self, bin: &BinaryProperties) {
@@ -105,8 +128,34 @@ impl Interpreter {
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),
             ASTNode::Identifier(id) => self.vars.resolve_identifier(id).clone(),
             ASTNode::BinaryNode(bn) => self.resolve_binary(&bn),
+            ASTNode::ObjectLiteral(ov) => self.resolve_object_literal(ov),
             _ => panic!("Unresolvable ASTNode value")
         }
+    }
+
+    fn resolve_object_literal (&mut self, ov: &ObjectLiteralProperties) -> KaffeeValue {
+        let mut keys = vec![];
+        let mut values = vec![];
+
+        // Alloc the keys as Kaffee strings
+        for key in &ov.keys {
+            let idx = self.vars.alloc_value(KaffeeValue::String(key.clone()), true);
+            keys.push(idx);
+        }
+
+        // Alloc the values
+        for val in &ov.values {
+            // Resolve the value
+            let res_val = self.resolve_node(val);
+            // Alloc the value
+            let idx = self.vars.alloc_value(res_val, false);
+            values.push(idx);
+        }
+
+        KaffeeValue::Object(ObjectValue {
+            keys,
+            values
+        })
     }
 
     fn resolve_binary (&mut self, bn: &BinaryProperties) -> KaffeeValue {

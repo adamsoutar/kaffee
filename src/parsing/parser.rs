@@ -58,9 +58,7 @@ impl Parser {
     }
 
     fn parse_statement (&mut self, t: Token) -> ASTNode {
-        println!("Parsing statement");
         if let Token::Keyword(kw) = t {
-            println!("{}", kw);
             let kwstr = &kw[..];
             match kwstr {
                 "let" => {
@@ -174,6 +172,9 @@ impl Parser {
 
         let mut args = vec![];
         loop {
+            // Some delims are empty ()
+            if self.is_next_punctuation(end) { break; }
+
             args.push(self.parse_component(false, 0));
 
             if !self.is_next_punctuation(delim) {

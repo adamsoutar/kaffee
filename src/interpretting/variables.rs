@@ -1,7 +1,11 @@
 use std::collections::HashMap;
 use crate::interpretting::interpreter_utils::*;
 
+// NOTE: Objects are shallow copied
+//       This isn't right.
+
 pub struct Variables {
+    // TODO: Constant should be in the scopestack?
     pub alloced: Vec<AllocedValue>,
     pub scopestack: Vec<HashMap<String, usize>>
 }
@@ -28,6 +32,10 @@ impl Variables {
         self.scopestack.push(HashMap::new())
     }
 
+    pub fn pop_scope (&mut self) {
+        self.scopestack.pop();
+    }
+
     pub fn alloc_in_scope (&mut self, identifier: &String, value: KaffeeValue, constant: bool) {
         let idx = self.alloced.len();
         self.alloc_value(value, constant);
@@ -39,12 +47,13 @@ impl Variables {
         self.scopestack[idx].insert(identifier, alloc_index);
     }
 
-    pub fn alloc_value (&mut self, value: KaffeeValue, constant: bool) {
+    pub fn alloc_value (&mut self, value: KaffeeValue, constant: bool) -> usize {
         self.alloced.push(AllocedValue {
             value,
             constant,
             ref_count: 0
-        })
+        });
+        self.alloced.len() - 1
     }
 
     pub fn print_allocced (&self) {
@@ -64,6 +73,13 @@ impl Variables {
                     KaffeeValue::Function(f) => {
                         format!("Function: {} args, {} body nodes", f.args.len(), f.body.len())
                     },
+                    KaffeeValue::Object(ov) => {
+                        let mut st = format!("Object:");
+                        for i in 0..ov.keys.len() {
+                            st = format!("{}\n    - {} - {}", st, ov.keys[i], ov.values[i])
+                        }
+                        st
+                    }
                     _ => String::from("TODO: This value type")
                 }
             )
@@ -73,7 +89,7 @@ impl Variables {
     pub fn print_scopestack (&self) {
         for i in 0..self.scopestack.len() {
             let scope = &self.scopestack[i];
-            println!("Stack frame {}:", i);
+            println!("Scope frame {}:", i);
             for (ident, idx) in scope {
                 println!(" - \"{}\" - {}", ident, idx);
             }
