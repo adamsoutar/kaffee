@@ -4,6 +4,8 @@ pub enum Token {
     Identifier(String),
     Keyword(String),
     Number(f64),
+    Boolean(bool),
+    Null,
     Operator(String),
     Punctuation(char)
 }

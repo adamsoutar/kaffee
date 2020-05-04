@@ -13,8 +13,8 @@ pub enum KaffeeValue {
     // Primitives
     Number(f64),
     String(String),
-    // TODO: Null
-    // TODO: Boolean
+    Boolean(bool),
+    Null,
 
     // Composed
     Object(ObjectValue),

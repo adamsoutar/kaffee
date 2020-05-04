@@ -79,6 +79,12 @@ impl Variables {
                             st = format!("{}\n    - {} - {}", st, ov.keys[i], ov.values[i])
                         }
                         st
+                    },
+                    KaffeeValue::Boolean(bl) => {
+                        format!("Boolean: {}", bl)
+                    },
+                    KaffeeValue::Null => {
+                        format!("Null")
                     }
                 }
             )

@@ -6,13 +6,7 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        if 1 {
-            println(\"Positive\")
-        } else {
-            println(\"Negative\")
-        }
-
-        println(\"Afterwards\")
+        let val = null
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

@@ -4,6 +4,7 @@ pub enum ASTNode {
     Number(f64),
     Identifier(String),
     Boolean(bool),
+    Null,
     ObjectLiteral(ObjectLiteralProperties),
     BlockStatement(Vec<ASTNode>),
     Assignment(BinaryProperties),

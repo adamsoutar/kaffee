@@ -34,8 +34,13 @@ impl Parser {
             },
             Token::Identifier(id) => {
                 return ASTNode::Identifier(id)
-            }
-            // TODO: Boolean literals
+            },
+            Token::Boolean(bl) => {
+                return ASTNode::Boolean(bl)
+            },
+            Token::Null => {
+                return ASTNode::Null
+            },
             _ => {}
         }
 

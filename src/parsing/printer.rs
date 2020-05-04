@@ -22,6 +22,12 @@ pub fn print_token (tk: &Token) {
         },
         Token::Punctuation(pnc) => {
             println!("Punctuation: {}", pnc)
+        },
+        Token::Boolean(bl) => {
+            println!("Boolean: {}", bl)
+        },
+        Token::Null => {
+            println!("Null literal")
         }
     }
 }
@@ -124,6 +130,9 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
                 print_at_depth(String::from("Else statement:"), depth);
                 print_ast_node(els, depth + 1);
             }
+        },
+        ASTNode::Null => {
+            print_at_depth(String::from("Null"), depth);
         }
     }
 }

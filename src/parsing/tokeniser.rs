@@ -68,6 +68,14 @@ impl Tokeniser {
             ident.push(self.code.read());
         }
         let st = String::from_iter(ident);
+
+        match &st[..] {
+            "true" => return Token::Boolean(true),
+            "false" => return Token::Boolean(false),
+            "null" => return Token::Null,
+            _ => {}
+        }
+
         if is_keyword(&st) {
             Token::Keyword(st)
         } else {

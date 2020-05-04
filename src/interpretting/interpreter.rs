@@ -148,6 +148,8 @@ impl Interpreter {
         match node {
             ASTNode::String(st) => KaffeeValue::String(st.clone()),
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),
+            ASTNode::Boolean(bl) => KaffeeValue::Boolean(bl.clone()),
+            ASTNode::Null => KaffeeValue::Null,
             ASTNode::Identifier(id) => self.vars.resolve_identifier(id).clone(),
             ASTNode::BinaryNode(bn) => self.resolve_binary(&bn),
             ASTNode::ObjectLiteral(ov) => self.resolve_object_literal(ov),
