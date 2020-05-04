@@ -80,7 +80,6 @@ impl Variables {
                         }
                         st
                     }
-                    _ => String::from("TODO: This value type")
                 }
             )
         }

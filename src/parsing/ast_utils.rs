@@ -3,6 +3,7 @@ pub enum ASTNode {
     String(String),
     Number(f64),
     Identifier(String),
+    Boolean(bool),
     ObjectLiteral(ObjectLiteralProperties),
     BlockStatement(Vec<ASTNode>),
     Assignment(BinaryProperties),
@@ -10,7 +11,8 @@ pub enum ASTNode {
     BinaryNode(BinaryProperties),
     FunctionCall(CallProperties),
     FunctionDefinition(FunctionDefinitionProperties),
-    PropertyAccess(AccessProperties)
+    PropertyAccess(AccessProperties),
+    IfStatement(IfProperties)
 }
 
 #[derive(Clone, PartialEq)]
@@ -18,6 +20,13 @@ pub struct FunctionDefinitionProperties {
     pub name: String,
     pub args: Vec<String>,
     pub body: Vec<ASTNode>
+}
+
+#[derive(Clone, PartialEq)]
+pub struct IfProperties {
+    pub check_exp: Box<ASTNode>,
+    pub body: Box<ASTNode>,
+    pub else_exp: Option<Box<ASTNode>>
 }
 
 #[derive(Clone, PartialEq)]

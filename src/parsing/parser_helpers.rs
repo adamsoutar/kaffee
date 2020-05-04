@@ -18,4 +18,11 @@ impl Parser {
             _ => false
         }
     }
+
+    pub fn is_next_keyword(&self, s: &str) -> bool {
+        match self.tokens.peek() {
+            Token::Keyword(st) => &st[..] == s,
+            _ => false
+        }
+    }
 }

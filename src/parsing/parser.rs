@@ -78,11 +78,37 @@ impl Parser {
                 "const" => {
                     return self.parse_variable_declaration(true)
                 },
-                _ => {}
+                "if" => {
+                    return self.parse_if_statement()
+                }
+                _ => panic!("Unknown keyword \"{}\"", kw)
+            }
+        }
+
+        if let Token::Punctuation(pnc) = t {
+            if pnc == '{' {
+                return self.parse_block_statement(false, true);
             }
         }
 
         panic!("Unsupported syntax")
+    }
+
+    fn parse_if_statement (&mut self) -> ASTNode {
+        let check_exp = Box::new(self.parse_component(false, 0));
+        let body = Box::new(self.parse_component(true, 0));
+
+        let mut else_exp = None;
+        if self.is_next_keyword("else") {
+            self.tokens.read();
+            else_exp = Some(Box::new(self.parse_component(true, 0)));
+        }
+
+        ASTNode::IfStatement(IfProperties {
+            check_exp,
+            body,
+            else_exp
+        })
     }
 
     fn parse_function_definition (&mut self) -> ASTNode {

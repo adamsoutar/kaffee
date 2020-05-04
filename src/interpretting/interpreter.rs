@@ -1,3 +1,4 @@
+use crate::parsing::printer::print_ast_node;
 use crate::parsing::parser;
 use crate::parsing::ast_utils::*;
 use crate::interpretting::interpreter_utils::*;
@@ -57,7 +58,24 @@ impl Interpreter {
             ASTNode::Assignment(asn) => self.assign_variable(asn),
             ASTNode::FunctionCall(cp) => self.eval_call(&cp),
             ASTNode::FunctionDefinition(fd) => self.eval_function_definition(&fd),
-            _ => panic!("Unsupported executable node")
+            ASTNode::IfStatement(ifs) => self.eval_if_stmnt(&ifs),
+            _ => {
+                print_ast_node(node, 0);
+                panic!("Unsupported executable node")
+            }
+        }
+    }
+
+    fn eval_if_stmnt(&mut self, ifp: &IfProperties) {
+        // TODO: Eval the check
+        let check = true;
+
+        if check {
+            self.eval_node(ifp.body.as_ref());
+        } else {
+            if let Some(en) = &ifp.else_exp {
+                self.eval_node(en.as_ref());
+            }
         }
     }
 

@@ -53,7 +53,7 @@ fn print_object_literal (obj: &ObjectLiteralProperties, depth: i32) {
     }
 }
 
-fn print_ast_node (node: &ASTNode, depth: i32) {
+pub fn print_ast_node (node: &ASTNode, depth: i32) {
     match node {
         ASTNode::Declaration(dec) => {
             print_at_depth(format!("Declaration, constant: {}", dec.constant), depth);
@@ -110,6 +110,19 @@ fn print_ast_node (node: &ASTNode, depth: i32) {
             print_at_depth(String::from("Body:"), depth + 1);
             for node in &fd.body {
                 print_ast_node(node, depth + 2)
+            }
+        },
+        ASTNode::Boolean(bl) => {
+            print_at_depth(format!("Boolean - {}", bl), depth)
+        },
+        ASTNode::IfStatement(istmt) => {
+            print_at_depth(String::from("If Statement:"), depth);
+            print_at_depth(String::from("Then statement:"), depth + 1);
+            print_ast_node(istmt.check_exp.as_ref(), depth + 1);
+
+            if let Some(els) = &istmt.else_exp {
+                print_at_depth(String::from("Else statement:"), depth);
+                print_ast_node(els, depth + 1);
             }
         }
     }
