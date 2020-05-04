@@ -58,6 +58,9 @@ impl Variables {
                     KaffeeValue::String(s) => {
                         format!("String: \"{}\"", s)
                     },
+                    KaffeeValue::NativeFunction(nm) => {
+                        format!("NativeFunction: \"{}\" - {} args", nm.name, nm.arg_count)
+                    }
                     _ => String::from("TODO: This value type")
                 }
             )
