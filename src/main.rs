@@ -1,15 +1,14 @@
 mod parsing;
 mod interpretting;
+mod std_lib;
 use interpretting::interpreter;
 use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let n = 1
-        n = 2
-        let n2 = n
-
         const name = \"Adam\"
+        println(\"My name is:\")
+        println(name)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

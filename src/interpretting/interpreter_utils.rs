@@ -15,8 +15,18 @@ pub enum KaffeeValue {
     // TODO: Boolean
 
     // Composed
-    Object(ObjectValue)
+    Object(ObjectValue),
+    NativeFunction(NativeMapping)
     // TODO: Function
+}
+
+pub type NativeFuncSignature = fn(Vec<KaffeeValue>);
+
+#[derive(Clone)]
+pub struct NativeMapping {
+    pub name: String,
+    pub arg_count: usize,
+    pub func: NativeFuncSignature
 }
 
 #[derive(Clone)]

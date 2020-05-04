@@ -3,6 +3,7 @@ use crate::parsing::ast_utils::*;
 use crate::interpretting::interpreter_utils::*;
 use crate::interpretting::variables::Variables;
 use crate::interpretting::variables;
+use crate::std_lib::functions::*;
 
 /*
     TODO: Instead of panicking, throw exceptions within the
@@ -16,9 +17,12 @@ pub struct Interpreter {
 
 impl Interpreter {
     pub fn run (&mut self) {
-        // TODO: Hoisting pass which puts functions etc.
-        //       in the scopestack
+        println!("\nProgram output:");
+
         self.vars.new_scope();
+        // Put funcs like println in the global scope
+        self.load_std_lib();
+
         for i in 0..self.ast.len() {
             let node = self.ast[i].clone();
             self.eval_node(&node)
@@ -27,6 +31,15 @@ impl Interpreter {
         println!("\nAllocced values:");
         self.vars.print_allocced();
         self.vars.print_scopestack();
+    }
+
+    fn load_std_lib (&mut self) {
+        for mapping in get_std_lib_mappings() {
+            self.vars.alloc_in_scope(
+                &mapping.name,
+                KaffeeValue::NativeFunction(mapping.clone()),
+                true)
+        }
     }
 
     fn eval_node (&mut self, node: &ASTNode) {
@@ -38,7 +51,18 @@ impl Interpreter {
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
+            ASTNode::FunctionCall(cp) => self.eval_call(&cp),
             _ => panic!("Unsupported executable node")
+        }
+    }
+
+    fn eval_call (&mut self, cp: &CallProperties) {
+        let callee = self.resolve_node(cp.callee.as_ref());
+        if let KaffeeValue::NativeFunction(nf) = callee {
+            let rargs = cp.args.iter().map(|x| self.resolve_node(x)).collect();
+            (nf.func)(rargs)
+        } else {
+            panic!("Calling anything but a NativeFunction is not yet supported.")
         }
     }
 
