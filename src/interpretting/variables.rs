@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use crate::interpretting::interpreter_utils::*;
-use crate::parsing::ast_utils::*;
 
 pub struct Variables {
     pub alloced: Vec<AllocedValue>,
@@ -8,6 +7,11 @@ pub struct Variables {
 }
 
 impl Variables {
+    pub fn resolve_identifier (&mut self, name: &String) -> &KaffeeValue {
+        let idx = self.find_variable_index(name);
+        &self.alloced[idx].value
+    }
+
     pub fn find_variable_index (&mut self, name: &String) -> usize {
         let max = self.scopestack.len() - 1;
         for i in (0..=max).rev() {

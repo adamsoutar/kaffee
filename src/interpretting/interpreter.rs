@@ -1,4 +1,3 @@
-use std::collections::HashMap;
 use crate::parsing::parser;
 use crate::parsing::ast_utils::*;
 use crate::interpretting::interpreter_utils::*;
@@ -39,9 +38,7 @@ impl Interpreter {
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
-            _ => {
-                panic!("Unsupported executable node")
-            }
+            _ => panic!("Unsupported executable node")
         }
     }
 
@@ -53,7 +50,7 @@ impl Interpreter {
                 panic!("Assignment to constant value \"{}\"", id);
             }
 
-            let val = self.resolve_value(bin.right.as_ref());
+            let val = self.resolve_node(bin.right.as_ref());
             self.vars.alloced[idx].value = val;
         } else {
             panic!("Assignment to non-identifiers is not yet supported")
@@ -62,17 +59,18 @@ impl Interpreter {
 
     pub fn define_variable (&mut self, dcl: &DeclarationProperties) {
         if let ASTNode::Identifier(id) = dcl.assignment.left.as_ref() {
-            let val = self.resolve_value(dcl.assignment.right.as_ref());
+            let val = self.resolve_node(dcl.assignment.right.as_ref());
             self.vars.alloc_in_scope(id, val, dcl.constant)
         } else {
             panic!("Left side of a declaration isn't an identifier")
         }
     }
 
-    fn resolve_value (&mut self, node: &ASTNode) -> KaffeeValue {
+    fn resolve_node (&mut self, node: &ASTNode) -> KaffeeValue {
         match node {
             ASTNode::String(st) => KaffeeValue::String(st.clone()),
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),
+            ASTNode::Identifier(id) => self.vars.resolve_identifier(id).clone(),
             _ => panic!("Unresolvable ASTNode value")
         }
     }

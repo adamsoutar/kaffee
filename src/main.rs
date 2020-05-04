@@ -7,6 +7,7 @@ fn main() {
     let code = String::from("
         let n = 1
         n = 2
+        let n2 = n
 
         const name = \"Adam\"
     ");
