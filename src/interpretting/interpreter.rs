@@ -68,6 +68,7 @@ impl Interpreter {
     }
 
     fn eval_if_stmnt(&mut self, ifp: &IfProperties) {
+        // TODO: Proper scoping, and returns from within the block
         let cbool = self.resolve_node(ifp.check_exp.as_ref());
         if let KaffeeValue::Boolean(check) = cbool {
             if check {
@@ -237,14 +238,6 @@ impl Interpreter {
         let rgt = self.resolve_node(bn.right.as_ref());
 
         return operators::operator_handler(lft, &bn.operator, rgt);
-    }
-
-    fn assert_number (&mut self, kv: &KaffeeValue) -> f64 {
-        if let KaffeeValue::Number(n) = kv {
-            n.clone()
-        } else {
-            panic!("Non-number used where one was expected.")
-        }
     }
 }
 
