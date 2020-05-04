@@ -28,7 +28,7 @@ pub struct FunctionDefinition {
     pub body: Vec<ASTNode>
 }
 
-pub type NativeFuncSignature = fn(Vec<KaffeeValue>);
+pub type NativeFuncSignature = fn(Vec<KaffeeValue>) -> KaffeeValue;
 
 #[derive(Clone, PartialEq)]
 pub struct NativeMapping {

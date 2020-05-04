@@ -136,6 +136,10 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
         },
         ASTNode::Null => {
             print_at_depth(String::from("Null"), depth);
+        },
+        ASTNode::ReturnStatement(rs) => {
+            print_at_depth(String::from("Return statement:"), depth);
+            print_ast_node(rs.as_ref(), depth + 1);
         }
     }
 }

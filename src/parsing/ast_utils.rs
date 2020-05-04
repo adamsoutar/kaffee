@@ -13,7 +13,8 @@ pub enum ASTNode {
     FunctionCall(CallProperties),
     FunctionDefinition(FunctionDefinitionProperties),
     PropertyAccess(AccessProperties),
-    IfStatement(IfProperties)
+    IfStatement(IfProperties),
+    ReturnStatement(Box<ASTNode>)
 }
 
 #[derive(Clone, PartialEq)]

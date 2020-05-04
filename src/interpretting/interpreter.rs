@@ -56,7 +56,7 @@ impl Interpreter {
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
-            ASTNode::FunctionCall(cp) => self.eval_call(&cp),
+            ASTNode::FunctionCall(cp) => { self.eval_call(&cp); },
             ASTNode::FunctionDefinition(fd) => self.eval_function_definition(&fd),
             ASTNode::IfStatement(ifs) => self.eval_if_stmnt(&ifs),
             _ => {
@@ -91,7 +91,8 @@ impl Interpreter {
         self.vars.alloc_in_scope(&fd.name, kv_fn, false);
     }
 
-    fn eval_call (&mut self, cp: &CallProperties) {
+    // Returns the "return value" of the function
+    fn eval_call (&mut self, cp: &CallProperties) -> KaffeeValue {
         let callee = self.resolve_node(cp.callee.as_ref());
         if let KaffeeValue::NativeFunction(nf) = callee {
             let rargs = cp.args.iter().map(|x| self.resolve_node(x)).collect();
@@ -103,7 +104,7 @@ impl Interpreter {
         }
     }
 
-    fn eval_userfn_call (&mut self, cp: &CallProperties, fd: &FunctionDefinition) {
+    fn eval_userfn_call (&mut self, cp: &CallProperties, fd: &FunctionDefinition) -> KaffeeValue {
         self.vars.new_scope();
 
         // Allocate arguments to the block scope
@@ -112,12 +113,20 @@ impl Interpreter {
             self.vars.alloc_in_scope(&fd.args[i], val, false);
         }
 
+        let mut return_value = KaffeeValue::Null;
         for node in &fd.body {
-            self.eval_node(node);
+            if let ASTNode::ReturnStatement(rs) = node {
+                return_value = self.resolve_node(rs);
+                break;
+            } else {
+                self.eval_node(node);
+            }
         }
 
         // TODO: Garbage collection
         self.vars.pop_scope();
+
+        return_value
     }
 
     fn assign_variable (&mut self, bin: &BinaryProperties) {
@@ -145,6 +154,7 @@ impl Interpreter {
     }
 
     fn resolve_node (&mut self, node: &ASTNode) -> KaffeeValue {
+        // TODO: Resolving of function calls
         match node {
             ASTNode::String(st) => KaffeeValue::String(st.clone()),
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),
@@ -155,7 +165,11 @@ impl Interpreter {
             ASTNode::ObjectLiteral(ov) => self.resolve_object_literal(ov),
             ASTNode::PropertyAccess(pa) => self.resolve_property_access(&pa),
             ASTNode::FunctionDefinition(fd) => self.ast_func_to_value(&fd),
-            _ => panic!("Unresolvable ASTNode value")
+            ASTNode::FunctionCall(cp) => self.eval_call(&cp),
+            _ => {
+                print_ast_node(node, 0);
+                panic!("Unresolvable ASTNode value")
+            }
         }
     }
 

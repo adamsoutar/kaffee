@@ -85,7 +85,10 @@ impl Parser {
                 },
                 "if" => {
                     return self.parse_if_statement()
-                }
+                },
+                "return" => {
+                    return self.parse_return_statement()
+                },
                 _ => panic!("Unknown keyword \"{}\"", kw)
             }
         }
@@ -97,6 +100,11 @@ impl Parser {
         }
 
         panic!("Unsupported syntax")
+    }
+
+    fn parse_return_statement (&mut self) -> ASTNode {
+        let val = self.parse_component(false, 0);
+        ASTNode::ReturnStatement(Box::new(val))
     }
 
     fn parse_if_statement (&mut self) -> ASTNode {
@@ -322,11 +330,11 @@ impl Parser {
 
         let mut statements = vec![];
         while !self.tokens.eof {
-            statements.push(self.parse_component(true, 0));
-
             if expect_last_brace && self.is_next_punctuation('}') {
                 break
             }
+
+            statements.push(self.parse_component(true, 0));
         }
 
         if expect_last_brace {

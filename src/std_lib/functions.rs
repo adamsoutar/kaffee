@@ -8,8 +8,9 @@ fn rust_stringify (value: &KaffeeValue) -> String {
     }
 }
 
-fn native_println (args: Vec<KaffeeValue>) {
-    println!("{}", rust_stringify(&args[0]))
+fn native_println (args: Vec<KaffeeValue>) -> KaffeeValue {
+    println!("{}", rust_stringify(&args[0]));
+    KaffeeValue::Null
 }
 
 pub fn get_std_lib_mappings () -> Vec<NativeMapping> {

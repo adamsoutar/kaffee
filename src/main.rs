@@ -6,11 +6,13 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        if true {
-            println(\"Positive\")
-        } else {
-            println(\"Negative\")
+        function nullertron () {
+            println(\"First\")
+            return null
+            println(\"Second\")
         }
+
+        nullertron()
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
