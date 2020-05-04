@@ -123,12 +123,15 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
         },
         ASTNode::IfStatement(istmt) => {
             print_at_depth(String::from("If Statement:"), depth);
+            print_at_depth(String::from("Condition:"), depth + 1);
+            print_ast_node(istmt.check_exp.as_ref(), depth + 2);
+
             print_at_depth(String::from("Then statement:"), depth + 1);
-            print_ast_node(istmt.check_exp.as_ref(), depth + 1);
+            print_ast_node(istmt.body.as_ref(), depth + 2);
 
             if let Some(els) = &istmt.else_exp {
-                print_at_depth(String::from("Else statement:"), depth);
-                print_ast_node(els, depth + 1);
+                print_at_depth(String::from("Else statement:"), depth + 1);
+                print_ast_node(els, depth + 2);
             }
         },
         ASTNode::Null => {
