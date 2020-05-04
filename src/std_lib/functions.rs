@@ -4,6 +4,8 @@ fn rust_stringify (value: &KaffeeValue) -> String {
     match value {
         KaffeeValue::Number(n) => format!("{}", n),
         KaffeeValue::String(st) => st.clone(),
+        KaffeeValue::Boolean(bl) => format!("{}", bl),
+        KaffeeValue::Null => String::from("Kaffee::null"),
         _ => String::from("Unstringifyable value")
     }
 }

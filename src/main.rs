@@ -6,13 +6,7 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function nullertron () {
-            println(\"First\")
-            return null
-            println(\"Second\")
-        }
-
-        nullertron()
+        println(2 == 2)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

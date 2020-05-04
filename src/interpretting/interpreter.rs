@@ -5,6 +5,7 @@ use crate::interpretting::interpreter_utils::*;
 use crate::interpretting::variables::Variables;
 use crate::interpretting::variables;
 use crate::std_lib::functions::*;
+use crate::std_lib::operators;
 
 /*
     TODO: Instead of panicking, throw exceptions within the
@@ -232,16 +233,7 @@ impl Interpreter {
         let lft = self.resolve_node(bn.left.as_ref());
         let rgt = self.resolve_node(bn.right.as_ref());
 
-        let ln = self.assert_number(&lft);
-        let rn = self.assert_number(&rgt);
-
-        KaffeeValue::Number(match &bn.operator[..] {
-            "+" => ln + rn,
-            "-" => ln - rn,
-            "/" => ln / rn,
-            "*" => ln * rn,
-            _ => panic!("Invalid operator in binary node")
-        })
+        return operators::operator_handler(lft, &bn.operator, rgt);
     }
 
     fn assert_number (&mut self, kv: &KaffeeValue) -> f64 {
