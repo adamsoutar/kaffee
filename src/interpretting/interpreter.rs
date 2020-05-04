@@ -61,11 +61,15 @@ impl Interpreter {
         }
     }
 
-    fn eval_function_definition (&mut self, fd: &FunctionDefinitionProperties) {
-        let kv_fn = KaffeeValue::Function(FunctionDefinition {
+    fn ast_func_to_value (&mut self, fd: &FunctionDefinitionProperties) -> KaffeeValue {
+        KaffeeValue::Function(FunctionDefinition {
             args: fd.args.clone(),
             body: fd.body.clone()
-        });
+        })
+    }
+
+    fn eval_function_definition (&mut self, fd: &FunctionDefinitionProperties) {
+        let kv_fn = self.ast_func_to_value(fd);
         self.vars.alloc_in_scope(&fd.name, kv_fn, false);
     }
 
@@ -130,6 +134,7 @@ impl Interpreter {
             ASTNode::BinaryNode(bn) => self.resolve_binary(&bn),
             ASTNode::ObjectLiteral(ov) => self.resolve_object_literal(ov),
             ASTNode::PropertyAccess(pa) => self.resolve_property_access(&pa),
+            ASTNode::FunctionDefinition(fd) => self.ast_func_to_value(&fd),
             _ => panic!("Unresolvable ASTNode value")
         }
     }

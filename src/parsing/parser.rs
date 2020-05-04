@@ -39,6 +39,17 @@ impl Parser {
             _ => {}
         }
 
+        // Some keywords are ok for expressions
+        // without being statements
+        if let Token::Keyword(kw) = &t {
+            match &kw[..] {
+                "function" => {
+                    return self.parse_function_definition()
+                },
+                _ => {}
+            }
+        }
+
         if !accept_statements {
             // When we aren't looking for statements,
             // {} is a dictionary
@@ -66,9 +77,6 @@ impl Parser {
                 },
                 "const" => {
                     return self.parse_variable_declaration(true)
-                },
-                "function" => {
-                    return self.parse_function_definition()
                 },
                 _ => {}
             }

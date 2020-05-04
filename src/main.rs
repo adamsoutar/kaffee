@@ -6,19 +6,18 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        const dude = {
-            name: \"Adam Soutar\",
-            age: 17
+        function sayHello () {
+            println(\"Hello\")
         }
 
-        function greet (person) {
-            println(\"Hello,\")
-            println(person.name)
-            println(\"You're\")
-            println(person.age)
+        const funcs = {
+            sayHello,
+            sayWorld: function sayWorld () {
+                println(\"World\")
+            }
         }
-
-        greet(dude)
+        funcs.sayHello()
+        funcs.sayWorld()
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
