@@ -68,15 +68,18 @@ impl Interpreter {
     }
 
     fn eval_if_stmnt(&mut self, ifp: &IfProperties) {
-        // TODO: Eval the check
-        let check = true;
-
-        if check {
-            self.eval_node(ifp.body.as_ref());
-        } else {
-            if let Some(en) = &ifp.else_exp {
-                self.eval_node(en.as_ref());
+        let cbool = self.resolve_node(ifp.check_exp.as_ref());
+        if let KaffeeValue::Boolean(check) = cbool {
+            if check {
+                self.eval_node(ifp.body.as_ref());
+            } else {
+                if let Some(en) = &ifp.else_exp {
+                    self.eval_node(en.as_ref());
+                }
             }
+        } else {
+            // TODO: Value coercion
+            panic!("If statement check doesn't resolve to a boolean")
         }
     }
 
