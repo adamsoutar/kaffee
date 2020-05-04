@@ -52,8 +52,17 @@ impl Interpreter {
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
             ASTNode::FunctionCall(cp) => self.eval_call(&cp),
+            ASTNode::FunctionDefinition(fd) => self.eval_function_definition(&fd),
             _ => panic!("Unsupported executable node")
         }
+    }
+
+    fn eval_function_definition (&mut self, fd: &FunctionDefinitionProperties) {
+        let kv_fn = KaffeeValue::Function(FunctionDefinition {
+            args: fd.args.clone(),
+            body: fd.body.clone()
+        });
+        self.vars.alloc_in_scope(&fd.name, kv_fn, false);
     }
 
     fn eval_call (&mut self, cp: &CallProperties) {

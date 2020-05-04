@@ -1,3 +1,5 @@
+use crate::parsing::ast_utils::ASTNode;
+
 #[derive(Clone)]
 pub struct AllocedValue {
     pub value: KaffeeValue,
@@ -16,8 +18,14 @@ pub enum KaffeeValue {
 
     // Composed
     Object(ObjectValue),
-    NativeFunction(NativeMapping)
-    // TODO: Function
+    NativeFunction(NativeMapping),
+    Function(FunctionDefinition)
+}
+
+#[derive(Clone)]
+pub struct FunctionDefinition {
+    pub args: Vec<String>,
+    pub body: Vec<ASTNode>
 }
 
 pub type NativeFuncSignature = fn(Vec<KaffeeValue>);
