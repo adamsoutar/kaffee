@@ -6,23 +6,19 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function say(str) {
-            function doubleNested () {
-                println(str)
-            }
-            doubleNested()
+        const dude = {
+            name: \"Adam Soutar\",
+            age: 17
         }
 
-        function wrappedSay(str) {
-            say(str)
+        function greet (person) {
+            println(\"Hello,\")
+            println(person.name)
+            println(\"You're\")
+            println(person.age)
         }
 
-        function nestTest () {
-            say(\"Nested\")
-            wrappedSay(\"Function calls?\")
-        }
-
-        nestTest()
+        greet(dude)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

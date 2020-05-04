@@ -129,8 +129,39 @@ impl Interpreter {
             ASTNode::Identifier(id) => self.vars.resolve_identifier(id).clone(),
             ASTNode::BinaryNode(bn) => self.resolve_binary(&bn),
             ASTNode::ObjectLiteral(ov) => self.resolve_object_literal(ov),
+            ASTNode::PropertyAccess(pa) => self.resolve_property_access(&pa),
             _ => panic!("Unresolvable ASTNode value")
         }
+    }
+
+    fn resolve_property_access (&mut self, pa: &AccessProperties) -> KaffeeValue {
+        let lft = self.resolve_node(pa.object.as_ref());
+
+        if let KaffeeValue::Object(obj) = lft {
+            if let ASTNode::Identifier(key) = pa.property.as_ref() {
+                let kstr = KaffeeValue::String(key.clone());
+
+                return self.lookup_object_value(&obj, &kstr);
+            } else {
+                panic!("Property is not an identifier.")
+            }
+        } else {
+            panic!("Property access on a non-object.")
+        }
+    }
+
+    fn lookup_object_value (&mut self, obj: &ObjectValue, kv: &KaffeeValue) -> KaffeeValue {
+        for i in 0..obj.keys.len() {
+            let idx = obj.keys[i];
+            let key = &self.vars.alloced[idx].value;
+
+            if key == kv {
+                let val = &self.vars.alloced[obj.values[i]].value;
+                return val.clone();
+            }
+        }
+
+        panic!("Key isn't present in object");
     }
 
     fn resolve_object_literal (&mut self, ov: &ObjectLiteralProperties) -> KaffeeValue {

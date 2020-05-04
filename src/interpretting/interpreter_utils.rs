@@ -8,7 +8,7 @@ pub struct AllocedValue {
 }
 
 // These also correspond to types
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub enum KaffeeValue {
     // Primitives
     Number(f64),
@@ -22,7 +22,7 @@ pub enum KaffeeValue {
     Function(FunctionDefinition)
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct FunctionDefinition {
     pub args: Vec<String>,
     pub body: Vec<ASTNode>
@@ -30,14 +30,14 @@ pub struct FunctionDefinition {
 
 pub type NativeFuncSignature = fn(Vec<KaffeeValue>);
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct NativeMapping {
     pub name: String,
     pub arg_count: usize,
     pub func: NativeFuncSignature
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct ObjectValue {
     pub keys: Vec<usize>,
     // Indexes into alloced
