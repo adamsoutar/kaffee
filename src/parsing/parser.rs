@@ -97,6 +97,9 @@ impl Parser {
                 },
                 "while" => {
                     return self.parse_while_loop()
+                },
+                "for" => {
+                    return self.parse_for_loop()
                 }
                 _ => panic!("Unknown keyword \"{}\"", kw)
             }
@@ -109,6 +112,34 @@ impl Parser {
         }
 
         panic!("Unsupported syntax")
+    }
+
+    fn parse_for_loop (&mut self) -> ASTNode {
+        // These are actually transformed into while loops by the parser
+        // NOTE: This does lead to quite a few unnecessary scopes
+        // TODO: for (let key in object) etc.
+        let mut expect_last = false;
+        if self.is_next_punctuation('(') {
+            // Bracketing for loop conditions is optional
+            self.tokens.read();
+            expect_last = true;
+        }
+
+        let decl = self.parse_component(true, 0);
+        let check = self.parse_component(true, 0);
+        let incr = self.parse_component(true, 0);
+        let body = self.parse_component(true, 0);
+
+        // Performs body of loop, then increments
+        let incr_body = ASTNode::BlockStatement(vec![body, incr]);
+
+        let wl = ASTNode::WhileLoop(WhileProperties {
+            check: Box::new(check),
+            body: Box::new(incr_body)
+        });
+
+        // Bundles the declaration at the start of the loop
+        ASTNode::BlockStatement(vec![decl, wl])
     }
 
     fn parse_while_loop (&mut self) -> ASTNode {

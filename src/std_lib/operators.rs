@@ -23,7 +23,19 @@ fn generic (l: KaffeeValue, op: &String, r: KaffeeValue) -> KaffeeValue {
     })
 }
 
+// Ops with two numbers
 fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
+    let bin_results = vec![">", "<", ">=", "<="];
+    if bin_results.contains(&&op[..]) {
+        return KaffeeValue::Boolean(match &op[..] {
+            ">" => l > r,
+            "<" => l < r,
+            ">=" => l >= r,
+            "<=" => r <= r,
+            _ => unreachable!()
+        })
+    }
+
     KaffeeValue::Number(match &op[..] {
         "+" => l + r,
         "-" => l - r,
@@ -35,6 +47,7 @@ fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
     })
 }
 
+// Ops with two bools
 fn bools (l: bool, op: &String, r: bool) -> KaffeeValue {
     KaffeeValue::Boolean(match &op[..] {
         "&&" => l && r,
