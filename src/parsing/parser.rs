@@ -239,6 +239,7 @@ impl Parser {
     }
 
     fn might_be_assignment (&mut self, me: ASTNode) -> ASTNode {
+        // TODO: Expand a *= b to a = a * b
         // The clone is to prevent a mutable/immutable borrow
         let t = self.tokens.peek().clone();
 

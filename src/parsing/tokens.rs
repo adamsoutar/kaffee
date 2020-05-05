@@ -41,7 +41,6 @@ pub fn is_keyword(s: &String) -> bool {
 }
 
 pub fn is_operator(s: &String) -> bool {
-    // TODO: Exponentiation operator
     in_string_vector(s, vec![
         "=", "==", "+", "-", "*", "/",
         "!=", "**", "%"

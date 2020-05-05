@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::interpretting::interpreter_utils::*;
 
-// NOTE: Objects are shallow copied
+// TODO: Objects are shallow copied
 //       This isn't right.
 
 pub struct Variables {

@@ -3,8 +3,6 @@ use crate::parsing::char_stream::CharStream;
 use crate::parsing::tokens::*;
 use std::iter::FromIterator;
 
-// TODO: Comments
-
 // Tokeniser acts like a stream
 pub struct Tokeniser {
     pub code: CharStream,
@@ -108,7 +106,7 @@ impl Tokeniser {
 
     fn read_string (&mut self) -> Token {
         let mut chars = vec![];
-        // TODO: Escapes and EOF
+        // TODO: Escape sequences
         while !self.code.eof && self.code.peek() != '"' {
             chars.push(self.code.read());
         }
