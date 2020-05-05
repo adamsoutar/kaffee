@@ -6,11 +6,16 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function countup (n) {
-            println(n)
-            countup(n + 1)
+        function test () {
+            println(\"Hello\")
+            if false {
+                println(\"New\")
+            } else {
+                return null
+            }
+            println(\"World\")
         }
-        countup(0)
+        test()
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

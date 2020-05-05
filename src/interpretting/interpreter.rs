@@ -30,7 +30,7 @@ impl Interpreter {
 
         for i in 0..self.ast.len() {
             let node = self.ast[i].clone();
-            self.eval_node(&node)
+            self.eval_node(&node);
         }
 
         println!("\nAllocced values:");
@@ -48,34 +48,49 @@ impl Interpreter {
         }
     }
 
-    fn eval_node (&mut self, node: &ASTNode) {
+    // Returns (Did it return early?, what did it return)
+    fn eval_node (&mut self, node: &ASTNode) -> (BreakType, KaffeeValue) {
         match node {
             ASTNode::BlockStatement(bs) => {
                 for n in bs {
-                    self.eval_node(n)
+                    if let ASTNode::ReturnStatement(ret_node) = n {
+                        let ret_value = self.resolve_node(ret_node);
+                        return (BreakType::Return, ret_value)
+                    } else {
+                        // If we eval a sub-block and it returns, we need to return, too
+                        let (bt, kv) = self.eval_node(n);
+                        if bt != BreakType::None { return (bt, kv) }
+                    }
                 }
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
             ASTNode::FunctionCall(cp) => { self.eval_call(&cp); },
             ASTNode::FunctionDefinition(fd) => self.eval_function_definition(&fd),
-            ASTNode::IfStatement(ifs) => self.eval_if_stmnt(&ifs),
+            ASTNode::IfStatement(ifs) => { return self.eval_if_stmnt(&ifs) },
+            ASTNode::ReturnStatement(rs) => {
+                return (BreakType::Return, self.resolve_node(rs.as_ref()))
+            },
             _ => {
                 print_ast_node(node, 0);
                 panic!("Unsupported executable node")
             }
         }
+
+        (BreakType::None, KaffeeValue::Null)
     }
 
-    fn eval_if_stmnt(&mut self, ifp: &IfProperties) {
+    fn eval_if_stmnt(&mut self, ifp: &IfProperties) -> (BreakType, KaffeeValue) {
         // TODO: Proper scoping, and returns from within the block
         let cbool = self.resolve_node(ifp.check_exp.as_ref());
         if let KaffeeValue::Boolean(check) = cbool {
             if check {
-                self.eval_node(ifp.body.as_ref());
+                return self.eval_node(ifp.body.as_ref());
             } else {
                 if let Some(en) = &ifp.else_exp {
-                    self.eval_node(en.as_ref());
+                    return self.eval_node(en.as_ref());
+                } else {
+                    return (BreakType::None, KaffeeValue::Null)
                 }
             }
         } else {
@@ -118,20 +133,12 @@ impl Interpreter {
             self.vars.alloc_in_scope(&fd.args[i], val, false);
         }
 
-        let mut return_value = KaffeeValue::Null;
-        for node in &fd.body {
-            if let ASTNode::ReturnStatement(rs) = node {
-                return_value = self.resolve_node(rs);
-                break;
-            } else {
-                self.eval_node(node);
-            }
-        }
+        let (_, ret_val) = self.eval_node(&ASTNode::BlockStatement(fd.body.clone()));
 
         // TODO: Garbage collection
         self.vars.pop_scope();
 
-        return_value
+        ret_val
     }
 
     fn assign_variable (&mut self, bin: &BinaryProperties) {

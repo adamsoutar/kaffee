@@ -7,6 +7,15 @@ pub struct AllocedValue {
     pub constant: bool
 }
 
+// Used to determine how blocks were left
+#[derive(Clone, PartialEq)]
+pub enum BreakType {
+    None,
+    // TODO: Break
+    // TODO: Continue
+    Return
+}
+
 // These also correspond to types
 #[derive(Clone, PartialEq)]
 pub enum KaffeeValue {
