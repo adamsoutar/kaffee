@@ -23,6 +23,8 @@ fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
         "-" => l - r,
         "*" => l * r,
         "/" => l / r,
+        "%" => l % r,
+        "**" => l.powf(r),
         _ => panic!("Invalid operator for two number types")
     })
 }

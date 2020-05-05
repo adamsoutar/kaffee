@@ -53,14 +53,9 @@ impl Interpreter {
         match node {
             ASTNode::BlockStatement(bs) => {
                 for n in bs {
-                    if let ASTNode::ReturnStatement(ret_node) = n {
-                        let ret_value = self.resolve_node(ret_node);
-                        return (BreakType::Return, ret_value)
-                    } else {
-                        // If we eval a sub-block and it returns, we need to return, too
-                        let (bt, kv) = self.eval_node(n);
-                        if bt != BreakType::None { return (bt, kv) }
-                    }
+                    // If we eval a sub-block and it returns, we need to return, too
+                    let (bt, kv) = self.eval_node(n);
+                    if bt != BreakType::None { return (bt, kv) }
                 }
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
