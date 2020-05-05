@@ -43,7 +43,7 @@ pub fn is_keyword(s: &String) -> bool {
 pub fn is_operator(s: &String) -> bool {
     in_string_vector(s, vec![
         "=", "==", "+", "-", "*", "/",
-        "!=", "**", "%"
+        "!=", "**", "%", "&&", "||"
     ])
 }
 pub fn is_assignment_operator (s: &String) -> bool {
@@ -55,12 +55,14 @@ pub fn is_assignment_operator (s: &String) -> bool {
 pub fn is_binary_operator (s: &String) -> bool {
     in_string_vector(s, vec![
         "+", "-", "*", "/", "==",
-        "!=", "**", "%"
+        "!=", "**", "%", "&&", "||"
     ])
 }
 pub fn get_operator_precedence (s: &String) -> i32 {
     let sstr = &s[..];
     match sstr {
+        "||" => 5,
+        "&&" => 6,
         "==" => 11,
         "!=" => 11,
         "+" => 14,
@@ -75,7 +77,7 @@ pub fn get_operator_precedence (s: &String) -> i32 {
 
 // Characters may be part of an operator, but not operators themselves
 pub fn is_operator_char (c: &char) -> bool {
-    in_char_string(c, "=!+-/*%")
+    in_char_string(c, "=!+-/*%&|")
 }
 
 pub fn is_punctuation(c: &char) -> bool {

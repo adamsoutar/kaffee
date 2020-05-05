@@ -10,7 +10,7 @@ fn main() {
             let out = n
             if n % 3 == 0 out = \"Fizz\"
             else if n % 5 == 0 out = \"Buzz\"
-            if n % 3 == 0 if n % 5 == 0 out = \"FizzBuzz\"
+            if n % 3 == 0 && n % 5 == 0 out = \"FizzBuzz\"
             println(out)
         }
         function countupto (n, x) {

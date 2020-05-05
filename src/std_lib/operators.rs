@@ -1,20 +1,26 @@
 use crate::interpretting::interpreter_utils::*;
 
 pub fn operator_handler (left: KaffeeValue, op: &String, right: KaffeeValue) -> KaffeeValue {
-    if op == "==" {
-        equal(left, right)
-    } else {
-        match (left, right) {
-            (KaffeeValue::Number(n1), KaffeeValue::Number(n2)) => maths(n1, op, n2),
-            _ => panic!("Invalid binary operation type signature.")
-        }
+    // TODO: This isn't very clean
+    let generic_ops = vec!["==", "!="];
+    if generic_ops.contains(&&op[..]) {
+        return generic(left, op, right)
+    }
+
+    match (left, right) {
+        (KaffeeValue::Number(n1), KaffeeValue::Number(n2)) => maths(n1, op, n2),
+        (KaffeeValue::Boolean(b1), KaffeeValue::Boolean(b2)) => bools(b1, op, b2),
+        _ => panic!("Invalid binary operation type signature.")
     }
 }
 
-fn equal (left: KaffeeValue, right: KaffeeValue) -> KaffeeValue {
-    // The values derive from PartialEq so impl is easy
-    // Only matches values of the same type
-    KaffeeValue::Boolean(left == right)
+// Some operators work on all types
+fn generic (l: KaffeeValue, op: &String, r: KaffeeValue) -> KaffeeValue {
+    KaffeeValue::Boolean(match &op[..] {
+        "==" => l == r,
+        "!=" => l != r,
+        _ => unreachable!()
+    })
 }
 
 fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
@@ -25,6 +31,14 @@ fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
         "/" => l / r,
         "%" => l % r,
         "**" => l.powf(r),
-        _ => panic!("Invalid operator for two number types")
+        _ => panic!("Invalid operator for two number types \"{}\"", op)
+    })
+}
+
+fn bools (l: bool, op: &String, r: bool) -> KaffeeValue {
+    KaffeeValue::Boolean(match &op[..] {
+        "&&" => l && r,
+        "||" => l || r,
+        _ => panic!("Invalid operator for two boolean types \"{}\"", op)
     })
 }
