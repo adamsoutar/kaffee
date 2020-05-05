@@ -6,6 +6,7 @@ fn rust_stringify (value: &KaffeeValue) -> String {
         KaffeeValue::String(st) => st.clone(),
         KaffeeValue::Boolean(bl) => format!("{}", bl),
         KaffeeValue::Null => String::from("Kaffee::null"),
+        // TODO: Exception for this
         _ => String::from("Unstringifyable value")
     }
 }

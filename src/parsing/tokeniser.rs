@@ -27,29 +27,52 @@ impl Tokeniser {
             return;
         }
 
-        let c = self.code.peek();
+        let c = self.code.read();
 
         // TODO: Fix reading of numbers like .5 as properties
         //       See https://github.com/adamsoutar/ajs/blob/d392fcd388a5cb3e044a7fcd32534d7b816520a7/parser/tokeniser.go#L108
         if c == '"' {
             self.current = self.read_string();
+        } else if c == '/' && self.code.peek() == '/' {
+            self.read_single_line_comment();
+            self.read_next();
+        } else if c == '/' && self.code.peek() == '*' {
+            self.read_multi_line_comment();
+            self.read_next();
         } else if is_identifier_start(&c) {
-            self.current = self.read_identifier();
+            self.current = self.read_identifier(c);
         } else if is_operator_char(&c) {
-            self.current = self.read_operator();
+            self.current = self.read_operator(c);
         } else if is_punctuation(&c) {
             // Punctuation is just one char, doesn't need a
             // read method
-            self.current = Token::Punctuation(self.code.read())
+            self.current = Token::Punctuation(c);
         } else if is_number(&c) {
-            self.current = self.read_number();
+            self.current = self.read_number(c);
         } else {
             panic!("Invalid syntax - unexpected character {} in code", c);
         }
     }
 
-    fn read_operator (&mut self) -> Token {
-        let mut op = vec![];
+    fn read_single_line_comment (&mut self) {
+        while !self.code.eof && self.code.peek() != '\n' {
+            self.code.read();
+        }
+    }
+
+    fn read_multi_line_comment (&mut self) {
+        self.code.read();
+        while !self.code.eof {
+            let c = self.code.read();
+            if c == '*' && self.code.peek() == '/' {
+                break;
+            }
+        }
+        self.code.read();
+    }
+
+    fn read_operator (&mut self, first: char) -> Token {
+        let mut op = vec![first];
         while !self.code.eof && is_operator_char(&self.code.peek()) {
             op.push(self.code.read());
         }
@@ -62,8 +85,8 @@ impl Tokeniser {
         Token::Operator(st)
     }
 
-    fn read_identifier (&mut self) -> Token {
-        let mut ident = vec![];
+    fn read_identifier (&mut self, first: char) -> Token {
+        let mut ident = vec![first];
         while !self.code.eof && is_identifier(&self.code.peek()) {
             ident.push(self.code.read());
         }
@@ -84,7 +107,6 @@ impl Tokeniser {
     }
 
     fn read_string (&mut self) -> Token {
-        self.code.read();
         let mut chars = vec![];
         // TODO: Escapes and EOF
         while !self.code.eof && self.code.peek() != '"' {
@@ -94,8 +116,8 @@ impl Tokeniser {
         Token::String(chars.iter().collect())
     }
 
-    fn read_number (&mut self) -> Token {
-        let mut vc = vec![];
+    fn read_number (&mut self, first: char) -> Token {
+        let mut vc = vec![first];
         while !self.code.eof && is_number(&self.code.peek()) {
             vc.push(self.code.read())
         }
