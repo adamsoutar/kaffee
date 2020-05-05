@@ -15,7 +15,9 @@ pub enum ASTNode {
     PropertyAccess(AccessProperties),
     IfStatement(IfProperties),
     ReturnStatement(Box<ASTNode>),
-    WhileLoop(WhileProperties)
+    WhileLoop(WhileProperties),
+    ContinueStatement,
+    BreakStatement
 }
 
 #[derive(Clone, PartialEq)]

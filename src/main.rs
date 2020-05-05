@@ -7,17 +7,18 @@ use parsing::printer::print_ast;
 fn main() {
     let code = String::from("
         function test () {
-            // Can we return from within loops?
+            let i = 0
             while true {
-                println(\"Stage 1\")
-                return null
-                println(\"Stage 2\")
+                if i == 10 break
+                i = i + 1
+                // Skip 5
+                if i == 5 continue
+                println(i)
             }
-            println(\"We shouldn't get here\")
+            println(\"Make sure we didn't return from the function\")
         }
-        println(\"Hello\")
-        test()
-        println(\"World\")
+
+        println(test())
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

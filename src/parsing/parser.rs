@@ -89,6 +89,12 @@ impl Parser {
                 "return" => {
                     return self.parse_return_statement()
                 },
+                "continue" => {
+                    return ASTNode::ContinueStatement
+                },
+                "break" => {
+                    return ASTNode::BreakStatement
+                },
                 "while" => {
                     return self.parse_while_loop()
                 }

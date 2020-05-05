@@ -11,8 +11,8 @@ pub struct AllocedValue {
 #[derive(Clone, PartialEq)]
 pub enum BreakType {
     None,
-    // TODO: Break
-    // TODO: Continue
+    Break,
+    Continue,
     Return
 }
 

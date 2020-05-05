@@ -150,6 +150,12 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
             print_ast_node(wl.check.as_ref(), depth + 2);
             print_at_depth(String::from("Body:"), depth + 1);
             print_ast_node(wl.body.as_ref(), depth + 2);
+        },
+        ASTNode::BreakStatement => {
+            print_at_depth(String::from("Break statement"), depth)
+        },
+        ASTNode::ContinueStatement => {
+            print_at_depth(String::from("Continue statement"), depth)
         }
     }
 }

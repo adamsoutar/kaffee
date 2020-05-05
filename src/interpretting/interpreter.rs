@@ -66,6 +66,12 @@ impl Interpreter {
             ASTNode::ReturnStatement(rs) => {
                 return (BreakType::Return, self.resolve_node(rs.as_ref()))
             },
+            ASTNode::ContinueStatement => {
+                return (BreakType::Continue, KaffeeValue::Null)
+            },
+            ASTNode::BreakStatement => {
+                return (BreakType::Break, KaffeeValue::Null)
+            },
             ASTNode::WhileLoop(wp) => { return self.eval_while_loop(&wp) },
             _ => {
                 print_ast_node(node, 0);
@@ -82,6 +88,9 @@ impl Interpreter {
             // TODO: Check for continue, break
             if b_type == BreakType::Return {
                 return (b_type, ret_val)
+            }
+            if b_type == BreakType::Break {
+                break;
             }
         }
 
