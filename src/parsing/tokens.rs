@@ -36,7 +36,7 @@ pub fn is_number(c: &char) -> bool {
 pub fn is_keyword(s: &String) -> bool {
     in_string_vector(s, vec![
         "let", "const", "function", "if", "else",
-        "return"
+        "return", "while" // TODO: For
     ])
 }
 

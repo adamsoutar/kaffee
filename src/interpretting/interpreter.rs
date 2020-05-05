@@ -66,6 +66,7 @@ impl Interpreter {
             ASTNode::ReturnStatement(rs) => {
                 return (BreakType::Return, self.resolve_node(rs.as_ref()))
             },
+            ASTNode::WhileLoop(wp) => { return self.eval_while_loop(&wp) },
             _ => {
                 print_ast_node(node, 0);
                 panic!("Unsupported executable node")
@@ -73,6 +74,28 @@ impl Interpreter {
         }
 
         (BreakType::None, KaffeeValue::Null)
+    }
+
+    fn eval_while_loop (&mut self, wp: &WhileProperties) -> (BreakType, KaffeeValue) {
+        while self.node_as_bool(wp.check.as_ref()) {
+            let (b_type, ret_val) = self.eval_node(wp.body.as_ref());
+            // TODO: Check for continue, break
+            if b_type == BreakType::Return {
+                return (b_type, ret_val)
+            }
+        }
+
+        (BreakType::None, KaffeeValue::Null)
+    }
+
+    fn node_as_bool (&mut self, node: &ASTNode) -> bool {
+        let res = self.resolve_node(node);
+        // TODO: Do co-ercion here
+        if let KaffeeValue::Boolean(bl) = res {
+            bl
+        } else {
+            panic!("Expected bool")
+        }
     }
 
     fn eval_if_stmnt(&mut self, ifp: &IfProperties) -> (BreakType, KaffeeValue) {

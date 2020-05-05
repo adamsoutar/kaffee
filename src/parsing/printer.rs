@@ -143,6 +143,13 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
         ASTNode::ReturnStatement(rs) => {
             print_at_depth(String::from("Return statement:"), depth);
             print_ast_node(rs.as_ref(), depth + 1);
+        },
+        ASTNode::WhileLoop(wl) => {
+            print_at_depth(String::from("While loop:"), depth);
+            print_at_depth(String::from("Check:"), depth + 1);
+            print_ast_node(wl.check.as_ref(), depth + 2);
+            print_at_depth(String::from("Body:"), depth + 1);
+            print_ast_node(wl.body.as_ref(), depth + 2);
         }
     }
 }

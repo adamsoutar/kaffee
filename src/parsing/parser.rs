@@ -89,6 +89,9 @@ impl Parser {
                 "return" => {
                     return self.parse_return_statement()
                 },
+                "while" => {
+                    return self.parse_while_loop()
+                }
                 _ => panic!("Unknown keyword \"{}\"", kw)
             }
         }
@@ -100,6 +103,15 @@ impl Parser {
         }
 
         panic!("Unsupported syntax")
+    }
+
+    fn parse_while_loop (&mut self) -> ASTNode {
+        let check = Box::new(self.parse_component(false, 0));
+        let body = Box::new(self.parse_component(true, 0));
+
+        ASTNode::WhileLoop(WhileProperties {
+            check, body
+        })
     }
 
     fn parse_return_statement (&mut self) -> ASTNode {

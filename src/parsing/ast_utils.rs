@@ -14,7 +14,14 @@ pub enum ASTNode {
     FunctionDefinition(FunctionDefinitionProperties),
     PropertyAccess(AccessProperties),
     IfStatement(IfProperties),
-    ReturnStatement(Box<ASTNode>)
+    ReturnStatement(Box<ASTNode>),
+    WhileLoop(WhileProperties)
+}
+
+#[derive(Clone, PartialEq)]
+pub struct WhileProperties {
+    pub check: Box<ASTNode>,
+    pub body: Box<ASTNode>
 }
 
 #[derive(Clone, PartialEq)]
@@ -48,7 +55,6 @@ pub struct BinaryProperties {
 pub struct DeclarationProperties {
     pub constant: bool,
     // TODO: Panic if declaration binary doesn't use =
-    //       and/or the left isn't an identifier
     pub assignment: BinaryProperties
 }
 
