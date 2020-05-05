@@ -37,6 +37,12 @@ impl Variables {
     }
 
     pub fn alloc_in_scope (&mut self, identifier: &String, value: KaffeeValue, constant: bool) {
+        let top_scope = self.scopestack.len() - 1;
+        if self.scopestack[top_scope].contains_key(identifier) {
+            panic!("Attempt to shadow identifier \"{}\" within the same scope!
+(You declared a variable with a conflicting name)", identifier)
+        }
+
         let idx = self.alloced.len();
         self.alloc_value(value, constant);
         self.add_to_scope(identifier.clone(), idx);

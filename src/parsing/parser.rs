@@ -125,6 +125,8 @@ impl Parser {
     }
 
     fn parse_function_definition (&mut self) -> ASTNode {
+        // TODO: Anonymous functions, also, warn when a non-anonymous
+        //       function is assigned to a variable
         let name_ident = &self.parse_atom(false);
         let name = self.ident_as_string(name_ident);
 

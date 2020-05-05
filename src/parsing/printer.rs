@@ -3,6 +3,9 @@
 use crate::parsing::ast_utils::*;
 use crate::parsing::tokens::*;
 
+// This is useful in some debug situations
+// But it's "dead code" in most builds
+#[allow(dead_code)]
 pub fn print_token (tk: &Token) {
     match tk {
         Token::Number(nm) => {
