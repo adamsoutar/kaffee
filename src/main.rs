@@ -6,19 +6,20 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function subret () {
-            return null
+        function fizzbuzz(n) {
+            let out = n
+            if n % 3 == 0 out = \"Fizz\"
+            else if n % 5 == 0 out = \"Buzz\"
+            if n % 3 == 0 if n % 5 == 0 out = \"FizzBuzz\"
+            println(out)
         }
+        function countupto (n, x) {
+            if n == x return null
 
-        function rettest () {
-            println(\"I should be printed\")
-            subret()
-            println(\"I should also be printed\")
+            fizzbuzz(n)
+            countupto(n + 1, x)
         }
-
-        println(\"Top-level 1\")
-        rettest()
-        println(\"Top-level 2\")
+        countupto(1, 100)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
