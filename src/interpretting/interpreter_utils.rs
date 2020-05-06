@@ -24,10 +24,10 @@ pub enum KaffeeValue {
     String(String),
     Boolean(bool),
     Null,
+    NativeFunction(NativeMapping),
 
     // Composed
     Object(ObjectValue),
-    NativeFunction(NativeMapping),
     Function(FunctionDefinition)
 }
 

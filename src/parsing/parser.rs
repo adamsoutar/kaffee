@@ -2,6 +2,7 @@ use crate::parsing::tokens::*;
 use crate::parsing::tokeniser;
 use crate::parsing::tokeniser::Tokeniser;
 use crate::parsing::ast_utils::*;
+use crate::parsing::printer::print_token;
 
 // Parser does not act like a stream, it
 // constructs the AST in one go
@@ -111,6 +112,7 @@ impl Parser {
             }
         }
 
+        print_token(&t);
         panic!("Unsupported syntax")
     }
 
@@ -128,6 +130,9 @@ impl Parser {
         let decl = self.parse_component(true, 0);
         let check = self.parse_component(true, 0);
         let incr = self.parse_component(true, 0);
+
+        if expect_last { self.expect_punctuation(')') }
+
         let body = self.parse_component(true, 0);
 
         // Performs body of loop, then increments
@@ -288,7 +293,6 @@ impl Parser {
     }
 
     fn might_be_assignment (&mut self, me: ASTNode) -> ASTNode {
-        // TODO: Expand a *= b to a = a * b
         // The clone is to prevent a mutable/immutable borrow
         let t = self.tokens.peek().clone();
 
@@ -296,11 +300,14 @@ impl Parser {
             if is_assignment_operator(&op) {
                 self.tokens.read();
 
-                return ASTNode::Assignment(BinaryProperties {
-                    left: Box::new(me),
-                    operator: op.clone(),
-                    right: Box::new(self.parse_component(false, 0))
-                })
+
+                if op == "=" {
+                    return ASTNode::Assignment(BinaryProperties {
+                        left: Box::new(me),
+                        operator: op.clone(),
+                        right: Box::new(self.parse_component(false, 0))
+                    })
+                }
             }
         }
 
