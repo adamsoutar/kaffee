@@ -32,7 +32,7 @@ fn maths (l: f64, op: &String, r: f64) -> KaffeeValue {
             ">" => l > r,
             "<" => l < r,
             ">=" => l >= r,
-            "<=" => r <= r,
+            "<=" => l <= r,
             _ => unreachable!()
         })
     }
