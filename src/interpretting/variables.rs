@@ -6,14 +6,17 @@ use crate::interpretting::interpreter_utils::*;
 
 pub struct Variables {
     // TODO: Constant should be in the scopestack?
-    pub alloced: Vec<AllocedValue>,
+    // pub alloced: Vec<AllocedValue>,
+    pub alloced: HashMap<usize, AllocedValue>,
+    pub alloc_index: usize,
     pub scopestack: Vec<HashMap<String, usize>>
 }
 
 impl Variables {
     pub fn resolve_identifier (&mut self, name: &String) -> &KaffeeValue {
         let idx = self.find_variable_index(name);
-        &self.alloced[idx].value
+
+        &self.alloced[&idx].value
     }
 
     pub fn find_variable_index (&mut self, name: &String) -> usize {
@@ -43,8 +46,7 @@ impl Variables {
 (You declared a variable with a conflicting name)", identifier)
         }
 
-        let idx = self.alloced.len();
-        self.alloc_value(value, constant);
+        let idx = self.alloc_value(value, constant);
         self.add_to_scope(identifier.clone(), idx);
     }
 
@@ -54,17 +56,18 @@ impl Variables {
     }
 
     pub fn alloc_value (&mut self, value: KaffeeValue, constant: bool) -> usize {
-        self.alloced.push(AllocedValue {
+        self.alloced.insert(self.alloc_index, AllocedValue {
             value,
-            constant,
-            ref_count: 0
+            constant
         });
-        self.alloced.len() - 1
+        self.alloc_index += 1;
+
+        self.alloc_index - 1
     }
 
     pub fn print_allocced (&self) {
         for i in 0..self.alloced.len() {
-            let v = &self.alloced[i];
+            let v = &self.alloced[&i];
             println!("{} - {}", i,
                 match &v.value {
                     KaffeeValue::Number(n) => {
@@ -114,13 +117,13 @@ impl Variables {
             panic!("Key isn't present in object")
         }
 
-        return self.alloced[idx].value.clone();
+        return self.alloced[&idx].value.clone();
     }
 
     pub fn lookup_object_value_index (&self, obj: &ObjectValue, kv: &KaffeeValue) -> (bool, usize) {
         for i in 0..obj.keys.len() {
             let idx = obj.keys[i];
-            let key = &self.alloced[idx].value;
+            let key = &self.alloced[&idx].value;
 
             if key == kv {
                 return (true, obj.values[i])
@@ -134,8 +137,8 @@ impl Variables {
         let ki = self.alloc_value(key, false);
         let vi = self.alloc_value(value, false);
 
-        let obj_val = &mut self.alloced[obj_idx].value;
-        let obj = match obj_val {
+        let obj_val = self.alloced.get_mut(&obj_idx).unwrap();
+        let obj = match &mut obj_val.value {
             KaffeeValue::Object(x) => x,
             _ => unreachable!()
         };
@@ -148,7 +151,8 @@ impl Variables {
 
 pub fn new () -> Variables {
     Variables {
-        alloced: vec![],
+        alloced: HashMap::new(),
+        alloc_index: 0,
         scopestack: vec![]
     }
 }

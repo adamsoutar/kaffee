@@ -189,12 +189,12 @@ impl Interpreter {
             return
         }
 
-        if self.vars.alloced[val_idx].constant {
+        if self.vars.alloced[&val_idx].constant {
             panic!("Assignment to constant value")
         }
 
         let val = self.resolve_node(bin.right.as_ref());
-        self.vars.alloced[val_idx].value = val;
+        self.vars.alloced.get_mut(&val_idx).unwrap().value = val;
     }
 
     fn handle_insertion (&mut self, bin: &BinaryProperties) {

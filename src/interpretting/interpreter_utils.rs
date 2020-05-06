@@ -3,7 +3,6 @@ use crate::parsing::ast_utils::ASTNode;
 #[derive(Clone)]
 pub struct AllocedValue {
     pub value: KaffeeValue,
-    pub ref_count: usize,
     pub constant: bool
 }
 
