@@ -174,20 +174,20 @@ impl Interpreter {
     }
 
     fn assign_variable (&mut self, bin: &BinaryProperties) {
-        // TODO: Assignment to non-identifiers
         if bin.operator != "=" { unreachable!() }
 
-        if let ASTNode::Identifier(id) = bin.left.as_ref() {
-            let idx = self.vars.find_variable_index(id);
-            if self.vars.alloced[idx].constant {
-                panic!("Assignment to constant value \"{}\"", id);
-            }
+        let (key_exists, val_idx) = self.resolve_assignment_target(bin.left.as_ref());
 
-            let val = self.resolve_node(bin.right.as_ref());
-            self.vars.alloced[idx].value = val;
-        } else {
-            panic!("Assignment to non-identifiers is not yet supported")
+        if !key_exists {
+            panic!("Key insertion via assignment is not yet supported")
         }
+
+        if self.vars.alloced[val_idx].constant {
+            panic!("Assignment to constant value")
+        }
+
+        let val = self.resolve_node(bin.right.as_ref());
+        self.vars.alloced[val_idx].value = val;
     }
 
     pub fn define_variable (&mut self, dcl: &DeclarationProperties) {
@@ -219,6 +219,33 @@ impl Interpreter {
         }
     }
 
+    // Returns (key exists (for property access), alloc idx)
+    fn resolve_assignment_target (&mut self, node: &ASTNode) -> (bool, usize) {
+        match node {
+            ASTNode::Identifier(id) => (true, self.vars.find_variable_index(&id)),
+            ASTNode::PropertyAccess(pa) => {
+                let lft = self.resolve_node(pa.object.as_ref());
+
+                if let KaffeeValue::Object(obj) = lft {
+                    if let ASTNode::Identifier(key) = pa.property.as_ref() {
+                        let kstr = KaffeeValue::String(key.clone());
+
+                        return self.lookup_object_value_index(&obj, &kstr);
+                    } else {
+                        panic!("Property is not an identifier")
+                    }
+                } else {
+                    panic!("Propert access on a non-object")
+                }
+            },
+            // TODO: Computed property access
+            _ => {
+                print_ast_node(node, 0);
+                panic!("Can't assign to this type")
+            }
+        }
+    }
+
     fn resolve_property_access (&mut self, pa: &AccessProperties) -> KaffeeValue {
         let lft = self.resolve_node(pa.object.as_ref());
 
@@ -236,6 +263,7 @@ impl Interpreter {
     }
 
     fn lookup_object_value (&mut self, obj: &ObjectValue, kv: &KaffeeValue) -> KaffeeValue {
+        // TODO: Move this to self.vars
         for i in 0..obj.keys.len() {
             let idx = obj.keys[i];
             let key = &self.vars.alloced[idx].value;
@@ -247,6 +275,18 @@ impl Interpreter {
         }
 
         panic!("Key isn't present in object");
+    }
+
+    fn lookup_object_value_index (&mut self, obj: &ObjectValue, kv: &KaffeeValue) -> (bool, usize) {
+        for i in 0..obj.keys.len() {
+            let idx = obj.keys[i];
+            let key = &self.vars.alloced[idx].value;
+
+            if key == kv {
+                return (true, obj.values[i])
+            }
+        }
+        (false, 0)
     }
 
     fn resolve_object_literal (&mut self, ov: &ObjectLiteralProperties) -> KaffeeValue {
