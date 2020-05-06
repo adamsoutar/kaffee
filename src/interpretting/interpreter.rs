@@ -147,7 +147,12 @@ impl Interpreter {
     fn eval_call (&mut self, cp: &CallProperties) -> KaffeeValue {
         let callee = self.resolve_node(cp.callee.as_ref());
         if let KaffeeValue::NativeFunction(nf) = callee {
-            let rargs = cp.args.iter().map(|x| self.resolve_node(x)).collect();
+            let rargs: Vec<KaffeeValue> = cp.args.iter().map(|x| self.resolve_node(x)).collect();
+
+            if rargs.len() != nf.arg_count {
+                panic!("{} takes {} arguments, but {} were supplied", nf.name, nf.arg_count, rargs.len())
+            }
+
             (nf.func)(rargs)
         } else if let KaffeeValue::Function(f) = callee {
             self.eval_userfn_call(cp, &f)
@@ -224,6 +229,8 @@ impl Interpreter {
         match node {
             ASTNode::Identifier(id) => (true, self.vars.find_variable_index(&id)),
             ASTNode::PropertyAccess(pa) => {
+                // TODO: This is very similar to resolve_propert_access
+                //       Consolidate?
                 let lft = self.resolve_node(pa.object.as_ref());
 
                 if let KaffeeValue::Object(obj) = lft {
@@ -235,7 +242,7 @@ impl Interpreter {
                         panic!("Property is not an identifier")
                     }
                 } else {
-                    panic!("Propert access on a non-object")
+                    panic!("Property access on a non-object")
                 }
             },
             // TODO: Computed property access
