@@ -12,6 +12,7 @@ use std::time::Instant;
     TODO: Instead of panicking, throw exceptions within the
           language which can be caught etc.
 */
+// TODO: So many methods unnecessarily take &mut self references
 
 pub struct Interpreter {
     pub ast: Vec<ASTNode>,
@@ -184,7 +185,8 @@ impl Interpreter {
         let (key_exists, val_idx) = self.resolve_assignment_target(bin.left.as_ref());
 
         if !key_exists {
-            panic!("Key insertion via assignment is not yet supported")
+            self.handle_insertion(bin);
+            return
         }
 
         if self.vars.alloced[val_idx].constant {
@@ -193,6 +195,29 @@ impl Interpreter {
 
         let val = self.resolve_node(bin.right.as_ref());
         self.vars.alloced[val_idx].value = val;
+    }
+
+    fn handle_insertion (&mut self, bin: &BinaryProperties) {
+        let pa = match bin.left.as_ref() {
+            ASTNode::PropertyAccess(x) => x,
+            _ => unreachable!()
+        };
+
+        let (exists, obj_idx) = self.resolve_assignment_target(pa.object.as_ref());
+        if !exists {
+            // TODO: Reword this error
+            panic!("Assignment with more than one level of non-existant key")
+        }
+
+        let id = match pa.property.as_ref() {
+            ASTNode::Identifier(x) => x,
+            _ => unreachable!()
+        };
+        let key = KaffeeValue::String(id.clone());
+
+        let value = self.resolve_node(bin.right.as_ref());
+
+        self.vars.insert_into_object(key, value, obj_idx);
     }
 
     pub fn define_variable (&mut self, dcl: &DeclarationProperties) {
@@ -237,7 +262,7 @@ impl Interpreter {
                     if let ASTNode::Identifier(key) = pa.property.as_ref() {
                         let kstr = KaffeeValue::String(key.clone());
 
-                        return self.lookup_object_value_index(&obj, &kstr);
+                        return self.vars.lookup_object_value_index(&obj, &kstr);
                     } else {
                         panic!("Property is not an identifier")
                     }
@@ -260,7 +285,7 @@ impl Interpreter {
             if let ASTNode::Identifier(key) = pa.property.as_ref() {
                 let kstr = KaffeeValue::String(key.clone());
 
-                return self.lookup_object_value(&obj, &kstr);
+                return self.vars.lookup_object_value(&obj, &kstr);
             } else {
                 panic!("Property is not an identifier.")
             }
@@ -269,32 +294,6 @@ impl Interpreter {
         }
     }
 
-    fn lookup_object_value (&mut self, obj: &ObjectValue, kv: &KaffeeValue) -> KaffeeValue {
-        // TODO: Move this to self.vars
-        for i in 0..obj.keys.len() {
-            let idx = obj.keys[i];
-            let key = &self.vars.alloced[idx].value;
-
-            if key == kv {
-                let val = &self.vars.alloced[obj.values[i]].value;
-                return val.clone();
-            }
-        }
-
-        panic!("Key isn't present in object");
-    }
-
-    fn lookup_object_value_index (&mut self, obj: &ObjectValue, kv: &KaffeeValue) -> (bool, usize) {
-        for i in 0..obj.keys.len() {
-            let idx = obj.keys[i];
-            let key = &self.vars.alloced[idx].value;
-
-            if key == kv {
-                return (true, obj.values[i])
-            }
-        }
-        (false, 0)
-    }
 
     fn resolve_object_literal (&mut self, ov: &ObjectLiteralProperties) -> KaffeeValue {
         let mut keys = vec![];

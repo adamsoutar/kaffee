@@ -106,6 +106,44 @@ impl Variables {
             }
         }
     }
+
+    pub fn lookup_object_value(&self, obj: &ObjectValue, kv: &KaffeeValue) -> KaffeeValue {
+        let (exists, idx) = self.lookup_object_value_index(obj, kv);
+
+        if !exists {
+            panic!("Key isn't present in object")
+        }
+
+        return self.alloced[idx].value.clone();
+    }
+
+    pub fn lookup_object_value_index (&self, obj: &ObjectValue, kv: &KaffeeValue) -> (bool, usize) {
+        for i in 0..obj.keys.len() {
+            let idx = obj.keys[i];
+            let key = &self.alloced[idx].value;
+
+            if key == kv {
+                return (true, obj.values[i])
+            }
+        }
+        (false, 0)
+    }
+
+    pub fn insert_into_object (&mut self, key: KaffeeValue, value: KaffeeValue, obj_idx: usize) {
+        // Alloc
+        let ki = self.alloc_value(key, false);
+        let vi = self.alloc_value(value, false);
+
+        let obj_val = &mut self.alloced[obj_idx].value;
+        let obj = match obj_val {
+            KaffeeValue::Object(x) => x,
+            _ => unreachable!()
+        };
+
+        // Add the mapping
+        obj.keys.push(ki);
+        obj.values.push(vi);
+    }
 }
 
 pub fn new () -> Variables {
