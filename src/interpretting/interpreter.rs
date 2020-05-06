@@ -118,7 +118,6 @@ impl Interpreter {
     }
 
     fn eval_if_stmnt(&mut self, ifp: &IfProperties) -> (BreakType, KaffeeValue) {
-        // TODO: Proper scoping, and returns from within the block
         let check = self.node_as_bool(ifp.check_exp.as_ref());
         if check {
             return self.eval_node(ifp.body.as_ref());
@@ -224,7 +223,6 @@ impl Interpreter {
     }
 
     fn resolve_node (&mut self, node: &ASTNode) -> KaffeeValue {
-        // TODO: Resolving of function calls
         match node {
             ASTNode::String(st) => KaffeeValue::String(st.clone()),
             ASTNode::Number(n) => KaffeeValue::Number(n.clone()),

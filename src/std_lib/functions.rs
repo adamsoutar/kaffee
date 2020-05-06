@@ -1,7 +1,7 @@
 use crate::interpretting::interpreter_utils::*;
 
 // TODO: To be able to stringify objects, we need access to the alloc array
-fn rust_stringify (value: &KaffeeValue, obj_depth: i32) -> String {
+fn rust_stringify (value: &KaffeeValue) -> String {
     match value {
         KaffeeValue::Number(n) => format!("{}", n),
         KaffeeValue::String(st) => st.clone(),
@@ -13,12 +13,12 @@ fn rust_stringify (value: &KaffeeValue, obj_depth: i32) -> String {
 }
 
 fn native_println (args: Vec<KaffeeValue>) -> KaffeeValue {
-    println!("{}", rust_stringify(&args[0], 0));
+    println!("{}", rust_stringify(&args[0]));
     KaffeeValue::Null
 }
 
 fn native_stringify(args: Vec<KaffeeValue>) -> KaffeeValue {
-    KaffeeValue::String(rust_stringify(&args[0], 0))
+    KaffeeValue::String(rust_stringify(&args[0]))
 }
 
 pub fn get_std_lib_mappings () -> Vec<NativeMapping> {

@@ -56,7 +56,6 @@ pub struct BinaryProperties {
 #[derive(Clone, PartialEq)]
 pub struct DeclarationProperties {
     pub constant: bool,
-    // TODO: Panic if declaration binary doesn't use =
     pub assignment: BinaryProperties
 }
 
