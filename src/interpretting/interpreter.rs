@@ -59,11 +59,13 @@ impl Interpreter {
     fn eval_node (&mut self, node: &ASTNode) -> (BreakType, KaffeeValue) {
         match node {
             ASTNode::BlockStatement(bs) => {
+                self.vars.new_scope();
                 for n in bs {
                     // If we eval a sub-block and it returns, we need to return, too
                     let (bt, kv) = self.eval_node(n);
                     if bt != BreakType::None { return (bt, kv) }
                 }
+                self.vars.pop_scope();
                 // Garbage collection
                 gc_collect(&mut self.vars.alloced, &mut self.vars.scopestack)
             },

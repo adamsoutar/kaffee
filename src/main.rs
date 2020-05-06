@@ -6,18 +6,8 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function fizzbuzz(n) {
-            let out = \"\"
-            if n % 3 == 0 out = \"Fizz\"
-            if n % 5 == 0 out += \"Buzz\"
-            if out == \"\" out = n
-            println(out)
-        }
-
-        // TODO: Optimise the fact that GC
-        //       is called 3 times per loop
-        for (let i = 1; i <= 500; i += 1) {
-            fizzbuzz(i)
+        {
+            let gc = \"?\"
         }
     ");
     let mut interp = interpreter::new(code);
