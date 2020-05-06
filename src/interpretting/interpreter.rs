@@ -265,6 +265,7 @@ impl Interpreter {
     }
 
     fn resolve_property_access (&mut self, pa: &AccessProperties) -> KaffeeValue {
+        // TODO: std_lib wrapper for prop. access on primitives like String for chars
         let lft = self.resolve_node(pa.object.as_ref());
 
         if let KaffeeValue::Object(obj) = lft {
