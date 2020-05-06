@@ -299,15 +299,33 @@ impl Parser {
         if let Token::Operator(op) = t {
             if is_assignment_operator(&op) {
                 self.tokens.read();
-
+                let right = Box::new(self.parse_component(false, 0));
 
                 if op == "=" {
                     return ASTNode::Assignment(BinaryProperties {
                         left: Box::new(me),
                         operator: op.clone(),
-                        right: Box::new(self.parse_component(false, 0))
+                        right
                     })
                 }
+
+                // We have an assignment operator
+                let idx = op.len() - 1;
+                // Takes the = off the end (**= => **)
+                let bin_op = String::from(&op[0..idx]);
+                // Synthesise a binary node
+                // Transforms a += 1 to a = a + 1
+                let bin = ASTNode::BinaryNode(BinaryProperties {
+                    left: Box::new(me.clone()),
+                    operator: bin_op,
+                    right
+                });
+
+                return ASTNode::Assignment(BinaryProperties {
+                    left: Box::new(me),
+                    operator: String::from("="),
+                    right: Box::new(bin)
+                })
             }
         }
 

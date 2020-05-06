@@ -44,7 +44,8 @@ pub fn is_operator(s: &String) -> bool {
     in_string_vector(s, vec![
         "=", "==", "+", "-", "*", "/",
         "!=", "**", "%", "&&", "||",
-        ">", "<", ">=", "<="
+        ">", "<", ">=", "<=", "+=", "*=",
+        "-=", "/=", "%=", "**="
     ])
 }
 pub fn is_assignment_operator (s: &String) -> bool {
