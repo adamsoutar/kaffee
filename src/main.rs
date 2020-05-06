@@ -6,12 +6,17 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let dude = {
-            name: \"Adam\",
-            age: 17
+        function fizzbuzz(n) {
+            let out = \"\"
+            if n % 3 == 0 out = \"Fizz\"
+            if n % 5 == 0 out += \"Buzz\"
+            if out == \"\" out = n
+            println(out)
         }
 
-        println(dude.name)
+        for (let i = 0; i < 500; i += 1) {
+            fizzbuzz(i)
+        }
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

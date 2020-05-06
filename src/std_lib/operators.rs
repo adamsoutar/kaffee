@@ -10,6 +10,7 @@ pub fn operator_handler (left: KaffeeValue, op: &String, right: KaffeeValue) -> 
     match (left, right) {
         (KaffeeValue::Number(n1), KaffeeValue::Number(n2)) => maths(n1, op, n2),
         (KaffeeValue::Boolean(b1), KaffeeValue::Boolean(b2)) => bools(b1, op, b2),
+        (KaffeeValue::String(s1), KaffeeValue::String(s2)) => strings(s1, op, s2),
         _ => panic!("Invalid binary operation type signature.")
     }
 }
@@ -53,5 +54,12 @@ fn bools (l: bool, op: &String, r: bool) -> KaffeeValue {
         "&&" => l && r,
         "||" => l || r,
         _ => panic!("Invalid operator for two boolean types \"{}\"", op)
+    })
+}
+
+fn strings (l: String, op: &String, r: String) -> KaffeeValue {
+    KaffeeValue::String(match &op[..] {
+        "+" => format!("{}{}", l, r),
+        _ => panic!("Invalid operator for two string types \"{}\"", op)
     })
 }
