@@ -179,8 +179,9 @@ impl Parser {
     }
 
     fn parse_function_definition (&mut self) -> ASTNode {
-        // TODO: Anonymous functions, also, warn when a non-anonymous
-        //       function is assigned to a variable
+        // TODO: Warn when a non-anonymous function is assigned to a variable
+        // TODO: Arrow functions
+        //       (Maybe if we change the 'function' keyword to 'fn' we wouldn't need this?)
         let mut name = String::from("");
 
         // Is this an anonymous function?

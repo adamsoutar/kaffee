@@ -6,7 +6,6 @@ use crate::interpretting::interpreter_utils::*;
 
 pub struct Variables {
     // TODO: Constant should be in the scopestack?
-    // pub alloced: Vec<AllocedValue>,
     pub alloced: HashMap<usize, AllocedValue>,
     pub alloc_index: usize,
     pub scopestack: Vec<HashMap<String, usize>>

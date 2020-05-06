@@ -109,30 +109,25 @@ impl Interpreter {
 
     fn node_as_bool (&mut self, node: &ASTNode) -> bool {
         let res = self.resolve_node(node);
-        // TODO: Do co-ercion here
-        if let KaffeeValue::Boolean(bl) = res {
-            bl
-        } else {
-            panic!("Expected bool")
+        // Truthy coercion
+        match res {
+            KaffeeValue::Boolean(bl) => bl,
+            KaffeeValue::Null => false,
+            _ => true
         }
     }
 
     fn eval_if_stmnt(&mut self, ifp: &IfProperties) -> (BreakType, KaffeeValue) {
         // TODO: Proper scoping, and returns from within the block
-        let cbool = self.resolve_node(ifp.check_exp.as_ref());
-        if let KaffeeValue::Boolean(check) = cbool {
-            if check {
-                return self.eval_node(ifp.body.as_ref());
-            } else {
-                if let Some(en) = &ifp.else_exp {
-                    return self.eval_node(en.as_ref());
-                } else {
-                    return (BreakType::None, KaffeeValue::Null)
-                }
-            }
+        let check = self.node_as_bool(ifp.check_exp.as_ref());
+        if check {
+            return self.eval_node(ifp.body.as_ref());
         } else {
-            // TODO: Value coercion
-            panic!("If statement check doesn't resolve to a boolean")
+            if let Some(en) = &ifp.else_exp {
+                return self.eval_node(en.as_ref());
+            } else {
+                return (BreakType::None, KaffeeValue::Null)
+            }
         }
     }
 
@@ -253,7 +248,7 @@ impl Interpreter {
         match node {
             ASTNode::Identifier(id) => (true, self.vars.find_variable_index(&id)),
             ASTNode::PropertyAccess(pa) => {
-                // TODO: This is very similar to resolve_propert_access
+                // TODO: This is very similar to resolve_property_access
                 //       Consolidate?
                 let lft = self.resolve_node(pa.object.as_ref());
 
@@ -264,7 +259,6 @@ impl Interpreter {
                     panic!("Property access on a non-object")
                 }
             },
-            // TODO: Computed property access
             _ => {
                 print_ast_node(node, 0);
                 panic!("Can't assign to this type")

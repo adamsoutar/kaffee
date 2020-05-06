@@ -6,10 +6,12 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let anon = function () {
-            println(\"Hello, world!\")
+        let coerce = null
+        if coerce {
+            println(\"True\")
+        } else {
+            println(\"False\")
         }
-        anon()
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
