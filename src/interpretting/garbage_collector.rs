@@ -12,11 +12,19 @@ pub fn gc_collect(
     // No VISPLANE_OVERFLOWs here :P
     let mut visplane: Vec<usize> = vec![];
 
-    // TODO: Follow object references
-    //       until then, this could leave dangling refs
     for scope in scopestack {
         for (_, idx) in scope {
-            visplane.push(*idx)
+            visplane.push(*idx);
+
+            // Follow object keys/values to avoid leaving
+            // dangling refs
+            let val = &alloced[idx];
+            if let KaffeeValue::Object(obj) = &val.value {
+                for i in 0..obj.keys.len() {
+                    visplane.push(obj.keys[i]);
+                    visplane.push(obj.values[i]);
+                }
+            }
         }
     }
 

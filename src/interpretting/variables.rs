@@ -66,8 +66,7 @@ impl Variables {
     }
 
     pub fn print_allocced (&self) {
-        for i in 0..self.alloced.len() {
-            let v = &self.alloced[&i];
+        for (i, v) in &self.alloced {
             println!("{} - {}", i,
                 match &v.value {
                     KaffeeValue::Number(n) => {

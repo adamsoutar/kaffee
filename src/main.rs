@@ -6,8 +6,12 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
+        let obj = {
+            test: true
+        }
         {
-            let gc = \"?\"
+            obj.name = \"Adam\"
+            let throwaway = \"GC?\"
         }
     ");
     let mut interp = interpreter::new(code);

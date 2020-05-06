@@ -207,6 +207,7 @@ impl Parser {
     }
 
     fn parse_object_literal (&mut self) -> ASTNode {
+        // TODO: Empty object literals
         let mut keys = vec![];
         let mut values = vec![];
 
