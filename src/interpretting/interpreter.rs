@@ -6,6 +6,7 @@ use crate::interpretting::variables::Variables;
 use crate::interpretting::variables;
 use crate::std_lib::functions::*;
 use crate::std_lib::operators;
+use std::time::Instant;
 
 /*
     TODO: Instead of panicking, throw exceptions within the
@@ -28,10 +29,14 @@ impl Interpreter {
         // User global scope is above std_lib global scope
         self.vars.new_scope();
 
+        let now = Instant::now();
+
         for i in 0..self.ast.len() {
             let node = self.ast[i].clone();
             self.eval_node(&node);
         }
+
+        println!("\nProgram execution time: {}ms", now.elapsed().as_millis());
 
         println!("\nAllocced values:");
         self.vars.print_allocced();
@@ -170,6 +175,8 @@ impl Interpreter {
 
     fn assign_variable (&mut self, bin: &BinaryProperties) {
         // TODO: Assignment to non-identifiers
+        if bin.operator != "=" { unreachable!() }
+
         if let ASTNode::Identifier(id) = bin.left.as_ref() {
             let idx = self.vars.find_variable_index(id);
             if self.vars.alloced[idx].constant {
