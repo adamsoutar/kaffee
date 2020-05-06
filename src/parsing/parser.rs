@@ -213,46 +213,49 @@ impl Parser {
     }
 
     fn parse_object_literal (&mut self) -> ASTNode {
-        // TODO: Empty object literals
         let mut keys = vec![];
         let mut values = vec![];
 
-        while !self.tokens.eof {
-            let t = self.tokens.read();
+        if !self.is_next_punctuation('}') {
+            while !self.tokens.eof {
+                let t = self.tokens.read();
 
-            if let Token::Identifier(id) = t {
-                keys.push(id.clone());
+                if let Token::Identifier(id) = t {
+                    keys.push(id.clone());
 
-                if self.is_next_punctuation(',') ||
-                   self.is_next_punctuation('}') {
-                    // This is an implicit key/value { a, b, c }
-                    values.push(ASTNode::Identifier(id));
-                    if self.is_next_punctuation('}') {
-                        self.tokens.read();
-                        break;
-                    }
-                    self.tokens.read();
-                    continue;
-                } else {
-                    // Explicit key/value { a: b }
-                    self.expect_punctuation(':');
-                    values.push(self.parse_component(false, 0));
-
-                    let nt = self.tokens.read();
-                    if let Token::Punctuation(pnc) = nt {
-                        if pnc == '}' {
-                            break
-                        } else if pnc == ',' {
-                            continue
+                    if self.is_next_punctuation(',') ||
+                       self.is_next_punctuation('}') {
+                        // This is an implicit key/value { a, b, c }
+                        values.push(ASTNode::Identifier(id));
+                        if self.is_next_punctuation('}') {
+                            self.tokens.read();
+                            break;
                         }
-                    }
+                        self.tokens.read();
+                        continue;
+                    } else {
+                        // Explicit key/value { a: b }
+                        self.expect_punctuation(':');
+                        values.push(self.parse_component(false, 0));
 
-                    panic!("Invalid token after value in object literal.")
-                }
-            } else {
-                panic!("Object keys should be identifiers
+                        let nt = self.tokens.read();
+                        if let Token::Punctuation(pnc) = nt {
+                            if pnc == '}' {
+                                break
+                            } else if pnc == ',' {
+                                continue
+                            }
+                        }
+
+                        panic!("Invalid token after value in object literal.")
+                    }
+                } else {
+                    panic!("Object keys should be identifiers
 (or you left a dangling comma { a, })")
+                }
             }
+        } else {
+            self.tokens.read();
         }
 
         ASTNode::ObjectLiteral(ObjectLiteralProperties{
