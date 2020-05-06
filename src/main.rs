@@ -14,6 +14,8 @@ fn main() {
             println(out)
         }
 
+        // TODO: Optimise the fact that GC
+        //       is called 3 times per loop
         for (let i = 0; i < 500; i += 1) {
             fizzbuzz(i)
         }

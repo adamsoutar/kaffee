@@ -6,6 +6,7 @@ use crate::interpretting::variables::Variables;
 use crate::interpretting::variables;
 use crate::std_lib::functions::*;
 use crate::std_lib::operators;
+use crate::interpretting::garbage_collector::*;
 use std::time::Instant;
 
 /*
@@ -63,6 +64,8 @@ impl Interpreter {
                     let (bt, kv) = self.eval_node(n);
                     if bt != BreakType::None { return (bt, kv) }
                 }
+                // Garbage collection
+                gc_collect(&mut self.vars.alloced, &mut self.vars.scopestack)
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
@@ -173,7 +176,6 @@ impl Interpreter {
 
         let (_, ret_val) = self.eval_node(&ASTNode::BlockStatement(fd.body.clone()));
 
-        // TODO: Garbage collection
         self.vars.pop_scope();
 
         ret_val
