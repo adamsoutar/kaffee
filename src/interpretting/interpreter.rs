@@ -96,7 +96,6 @@ impl Interpreter {
     fn eval_while_loop (&mut self, wp: &WhileProperties) -> (BreakType, KaffeeValue) {
         while self.node_as_bool(wp.check.as_ref()) {
             let (b_type, ret_val) = self.eval_node(wp.body.as_ref());
-            // TODO: Check for continue, break
             if b_type == BreakType::Return {
                 return (b_type, ret_val)
             }

@@ -6,13 +6,10 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let obj = {
-            test: true
+        let anon = function () {
+            println(\"Hello, world!\")
         }
-        {
-            obj.name = \"Adam\"
-            let throwaway = \"GC?\"
-        }
+        anon()
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

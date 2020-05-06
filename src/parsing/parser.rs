@@ -181,8 +181,13 @@ impl Parser {
     fn parse_function_definition (&mut self) -> ASTNode {
         // TODO: Anonymous functions, also, warn when a non-anonymous
         //       function is assigned to a variable
-        let name_ident = &self.parse_atom(false);
-        let name = self.ident_as_string(name_ident);
+        let mut name = String::from("");
+
+        // Is this an anonymous function?
+        if !self.is_next_punctuation('(') {
+            let name_ident = &self.parse_atom(false);
+            name = self.ident_as_string(name_ident);
+        }
 
         let args = self.parse_delimited('(', ',', ')')
             .iter().map(|x| self.ident_as_string(x)).collect();
