@@ -209,11 +209,7 @@ impl Interpreter {
             panic!("Assignment with more than one level of non-existant key")
         }
 
-        let id = match pa.property.as_ref() {
-            ASTNode::Identifier(x) => x,
-            _ => unreachable!()
-        };
-        let key = KaffeeValue::String(id.clone());
+        let key = self.resolve_node(pa.property.as_ref());
 
         let value = self.resolve_node(bin.right.as_ref());
 
@@ -259,13 +255,8 @@ impl Interpreter {
                 let lft = self.resolve_node(pa.object.as_ref());
 
                 if let KaffeeValue::Object(obj) = lft {
-                    if let ASTNode::Identifier(key) = pa.property.as_ref() {
-                        let kstr = KaffeeValue::String(key.clone());
-
-                        return self.vars.lookup_object_value_index(&obj, &kstr);
-                    } else {
-                        panic!("Property is not an identifier")
-                    }
+                    let key = self.resolve_node(pa.property.as_ref());
+                    return self.vars.lookup_object_value_index(&obj, &key);
                 } else {
                     panic!("Property access on a non-object")
                 }
@@ -282,13 +273,8 @@ impl Interpreter {
         let lft = self.resolve_node(pa.object.as_ref());
 
         if let KaffeeValue::Object(obj) = lft {
-            if let ASTNode::Identifier(key) = pa.property.as_ref() {
-                let kstr = KaffeeValue::String(key.clone());
-
-                return self.vars.lookup_object_value(&obj, &kstr);
-            } else {
-                panic!("Property is not an identifier.")
-            }
+            let key = self.resolve_node(pa.property.as_ref());
+            return self.vars.lookup_object_value(&obj, &key);
         } else {
             panic!("Property access on a non-object.")
         }

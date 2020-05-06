@@ -373,9 +373,32 @@ impl Parser {
     fn might_be_property_access (&mut self, node: ASTNode) -> (bool, ASTNode) {
         if self.is_next_punctuation('.') {
             self.tokens.read();
+
+            let key = self.parse_atom(false);
+            if let ASTNode::Identifier(id) = key {
+                // This transforms obj.key into obj["key"]
+                return (true, ASTNode::PropertyAccess(AccessProperties {
+                    object: Box::new(node),
+                    property: Box::new(ASTNode::String(id))
+                }))
+            } else {
+                panic!("Property access (a.b) key must be an identifier")
+            }
+        }
+
+        (false, node)
+    }
+
+    fn might_be_computed_property_access (&mut self, node: ASTNode) -> (bool, ASTNode) {
+        if self.is_next_punctuation('[') {
+            self.tokens.read();
+
+            let key = self.parse_atom(false);
+            self.expect_punctuation(']');
+
             return (true, ASTNode::PropertyAccess(AccessProperties {
                 object: Box::new(node),
-                property: Box::new(self.parse_atom(false))
+                property: Box::new(key)
             }))
         }
 
@@ -385,11 +408,12 @@ impl Parser {
     fn parse_component (&mut self, accept_statements: bool, prec: i32) -> ASTNode {
         let mut node = self.parse_atom(accept_statements);
 
-        loop {
+        while !self.tokens.eof {
             let (was_acc, acc_node) = self.might_be_property_access(node.clone());
-            let (was_call, call_node) = self.might_be_call(acc_node);
+            let (was_comp, comp_node) = self.might_be_computed_property_access(acc_node);
+            let (was_call, call_node) = self.might_be_call(comp_node);
 
-            if !(was_acc || was_call) {
+            if !(was_acc || was_call || was_comp) {
                 break;
             }
 

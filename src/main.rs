@@ -9,8 +9,14 @@ fn main() {
         let dude = {
             name: \"Adam\"
         }
-        dude.age = 17
-        println(dude.age)
+
+        let key = \"age\"
+        dude[key] = 17
+        dude.project = \"KaffeeLang\"
+
+        println(dude.name)
+        println(dude[\"age\"])
+        println(dude.project)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
