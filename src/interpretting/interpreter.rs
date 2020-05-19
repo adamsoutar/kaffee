@@ -6,7 +6,7 @@ use crate::interpretting::variables::Variables;
 use crate::interpretting::variables;
 use crate::std_lib::functions::*;
 use crate::std_lib::operators;
-use crate::interpretting::garbage_collector::*;
+use crate::interpretting::garbage_collector;
 use std::time::Instant;
 
 /*
@@ -55,6 +55,11 @@ impl Interpreter {
         }
     }
 
+    fn gc_collect (&mut self) {
+        // Garbage collection
+        garbage_collector::gc_collect(&mut self.vars.alloced, &mut self.vars.scopestack)
+    }
+
     // Returns (Did it return early?, what did it return)
     fn eval_node (&mut self, node: &ASTNode) -> (BreakType, KaffeeValue) {
         match node {
@@ -63,11 +68,16 @@ impl Interpreter {
                 for n in bs {
                     // If we eval a sub-block and it returns, we need to return, too
                     let (bt, kv) = self.eval_node(n);
-                    if bt != BreakType::None { return (bt, kv) }
+                    if bt != BreakType::None {
+                        // We still need to GC collect if we return early
+                        self.vars.pop_scope();
+                        self.gc_collect();
+                        return (bt, kv)
+                    }
                 }
+                // TODO: Remove this repetition
                 self.vars.pop_scope();
-                // Garbage collection
-                gc_collect(&mut self.vars.alloced, &mut self.vars.scopestack)
+                self.gc_collect();
             },
             ASTNode::Declaration(dcl) => self.define_variable(dcl),
             ASTNode::Assignment(asn) => self.assign_variable(asn),
@@ -172,6 +182,8 @@ impl Interpreter {
         let (_, ret_val) = self.eval_node(&ASTNode::BlockStatement(fd.body.clone()));
 
         self.vars.pop_scope();
+        // This collects the argument variables
+        self.gc_collect();
 
         ret_val
     }
