@@ -212,7 +212,7 @@ impl Interpreter {
             _ => unreachable!()
         };
 
-        // Can't to implicit assignment with an array
+        // Can't do implicit assignment with an array
         match self.resolve_node(pa.object.as_ref()) {
             KaffeeValue::Object(_) => {},
             _ => panic!("Attempted to access a non-existent key in an array")
