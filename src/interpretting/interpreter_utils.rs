@@ -1,4 +1,5 @@
 use crate::parsing::ast_utils::ASTNode;
+use crate::interpretting::variables::Variables;
 
 #[derive(Clone)]
 pub struct AllocedValue {
@@ -39,13 +40,20 @@ pub struct FunctionDefinition {
     pub body: Vec<ASTNode>
 }
 
-pub type NativeFuncSignature = fn(Vec<KaffeeValue>) -> KaffeeValue;
+pub type NativeFuncSignature = fn(Vec<KaffeeValue>, &mut Variables) -> KaffeeValue;
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone)]
 pub struct NativeMapping {
     pub name: String,
     pub arg_count: usize,
     pub func: NativeFuncSignature
+}
+
+// Native mappings (eg. println) are the same if their names are the same
+impl PartialEq for NativeMapping {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
 }
 
 #[derive(Clone, PartialEq)]

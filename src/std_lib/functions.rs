@@ -1,7 +1,8 @@
 use crate::interpretting::interpreter_utils::*;
+use crate::interpretting::variables::Variables;
 
 // TODO: To be able to stringify objects, we need access to the alloc array
-fn rust_stringify (value: &KaffeeValue) -> String {
+fn rust_stringify (value: &KaffeeValue, _: &mut Variables) -> String {
     match value {
         KaffeeValue::Number(n) => format!("{}", n),
         KaffeeValue::String(st) => st.clone(),
@@ -12,13 +13,13 @@ fn rust_stringify (value: &KaffeeValue) -> String {
     }
 }
 
-fn native_println (args: Vec<KaffeeValue>) -> KaffeeValue {
-    println!("{}", rust_stringify(&args[0]));
+fn native_println (args: Vec<KaffeeValue>, v: &mut Variables) -> KaffeeValue {
+    println!("{}", rust_stringify(&args[0], v));
     KaffeeValue::Null
 }
 
-fn native_stringify(args: Vec<KaffeeValue>) -> KaffeeValue {
-    KaffeeValue::String(rust_stringify(&args[0]))
+fn native_stringify(args: Vec<KaffeeValue>, v: &mut Variables) -> KaffeeValue {
+    KaffeeValue::String(rust_stringify(&args[0], v))
 }
 
 pub fn get_std_lib_mappings () -> Vec<NativeMapping> {

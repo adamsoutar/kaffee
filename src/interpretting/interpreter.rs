@@ -162,7 +162,7 @@ impl Interpreter {
                 panic!("{} takes {} arguments, but {} were supplied", nf.name, nf.arg_count, rargs.len())
             }
 
-            (nf.func)(rargs)
+            (nf.func)(rargs, &mut self.vars)
         } else if let KaffeeValue::Function(f) = callee {
             self.eval_userfn_call(cp, &f)
         } else {
