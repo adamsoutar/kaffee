@@ -28,6 +28,8 @@ pub enum KaffeeValue {
 
     // Composed
     Object(ObjectValue),
+    // Points into the alloc hashmap
+    Array(Vec<usize>),
     Function(FunctionDefinition)
 }
 

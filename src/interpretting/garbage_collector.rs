@@ -25,6 +25,12 @@ pub fn gc_collect(
                     visplane.push(obj.values[i]);
                 }
             }
+            // Follow array values for the same reason
+            if let KaffeeValue::Array(arr) = &val.value {
+                for idx in arr {
+                    visplane.push(idx.clone())
+                }
+            }
         }
     }
 

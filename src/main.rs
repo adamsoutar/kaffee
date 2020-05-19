@@ -6,12 +6,12 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        // let numbers = [1, 2, 3, 4]
-        let a = 2
-        function n(x) {
+        let numbers = [1, 2, 3, 4]
+        numbers[4] = 5
 
+        for let i = 0; i < 4; i += 1 {
+            println(numbers[i])
         }
-        n(5)
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);

@@ -212,6 +212,12 @@ impl Interpreter {
             _ => unreachable!()
         };
 
+        // Can't to implicit assignment with an array
+        match self.resolve_node(pa.object.as_ref()) {
+            KaffeeValue::Object(_) => {},
+            _ => panic!("Attempted to access a non-existent key in an array")
+        }
+
         let (exists, obj_idx) = self.resolve_assignment_target(pa.object.as_ref());
         if !exists {
             // TODO: Reword this error
@@ -246,6 +252,7 @@ impl Interpreter {
             ASTNode::PropertyAccess(pa) => self.resolve_property_access(&pa),
             ASTNode::FunctionDefinition(fd) => self.ast_func_to_value(&fd),
             ASTNode::FunctionCall(cp) => self.eval_call(&cp),
+            ASTNode::ArrayLiteral(items) => self.resolve_array_literal(&items),
             _ => {
                 print_ast_node(node, 0);
                 panic!("Unresolvable ASTNode value")
@@ -253,22 +260,21 @@ impl Interpreter {
         }
     }
 
+    fn resolve_array_literal (&mut self, items: &Vec<ASTNode>) -> KaffeeValue {
+        let mut idxs = vec![];
+        for i in items {
+            let val = self.resolve_node(i);
+            idxs.push(self.vars.alloc_value(val, false))
+        }
+
+        KaffeeValue::Array(idxs)
+    }
+
     // Returns (key exists (for property access), alloc idx)
     fn resolve_assignment_target (&mut self, node: &ASTNode) -> (bool, usize) {
         match node {
             ASTNode::Identifier(id) => (true, self.vars.find_variable_index(&id)),
-            ASTNode::PropertyAccess(pa) => {
-                // TODO: This is very similar to resolve_property_access
-                //       Consolidate?
-                let lft = self.resolve_node(pa.object.as_ref());
-
-                if let KaffeeValue::Object(obj) = lft {
-                    let key = self.resolve_node(pa.property.as_ref());
-                    return self.vars.lookup_object_value_index(&obj, &key);
-                } else {
-                    panic!("Property access on a non-object")
-                }
-            },
+            ASTNode::PropertyAccess(pa) => self.lookup_property_access(pa),
             _ => {
                 print_ast_node(node, 0);
                 panic!("Can't assign to this type")
@@ -276,16 +282,28 @@ impl Interpreter {
         }
     }
 
-    fn resolve_property_access (&mut self, pa: &AccessProperties) -> KaffeeValue {
+    fn lookup_property_access (&mut self, pa: &AccessProperties) -> (bool, usize) {
         // TODO: std_lib wrapper for prop. access on primitives like String for chars
         let lft = self.resolve_node(pa.object.as_ref());
+        let key = self.resolve_node(pa.property.as_ref());
 
         if let KaffeeValue::Object(obj) = lft {
-            let key = self.resolve_node(pa.property.as_ref());
-            return self.vars.lookup_object_value(&obj, &key);
-        } else {
-            panic!("Property access on a non-object.")
+            return self.vars.lookup_object_value_index(&obj, &key)
+        } else if let KaffeeValue::Array(items) = lft {
+            return self.vars.lookup_array_value_index(&items, &key)
         }
+
+        panic!("Property access isn't supported on that type")
+    }
+
+    fn resolve_property_access (&mut self, pa: &AccessProperties) -> KaffeeValue {
+        let (exists, idx) = self.lookup_property_access(pa);
+
+        if !exists {
+            panic!("Property access key doesn't exist")
+        }
+
+        self.vars.alloced[&idx].value.clone()
     }
 
 

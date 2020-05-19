@@ -87,6 +87,13 @@ impl Variables {
                         }
                         st
                     },
+                    KaffeeValue::Array(it) => {
+                        let mut st = format!("Array:");
+                        for i in it {
+                            st = format!("{}\n    - {}", st, i);
+                        }
+                        st
+                    },
                     KaffeeValue::Boolean(bl) => {
                         format!("Boolean: {}", bl)
                     },
@@ -108,16 +115,6 @@ impl Variables {
         }
     }
 
-    pub fn lookup_object_value(&self, obj: &ObjectValue, kv: &KaffeeValue) -> KaffeeValue {
-        let (exists, idx) = self.lookup_object_value_index(obj, kv);
-
-        if !exists {
-            panic!("Key isn't present in object")
-        }
-
-        return self.alloced[&idx].value.clone();
-    }
-
     pub fn lookup_object_value_index (&self, obj: &ObjectValue, kv: &KaffeeValue) -> (bool, usize) {
         for i in 0..obj.keys.len() {
             let idx = obj.keys[i];
@@ -127,6 +124,22 @@ impl Variables {
                 return (true, obj.values[i])
             }
         }
+        (false, 0)
+    }
+
+    pub fn lookup_array_value_index (&self, arr: &Vec<usize>, kv: &KaffeeValue) -> (bool, usize) {
+        if let KaffeeValue::Number(n) = kv {
+            // Can't cast a negative num to usize
+            if n < &0. { return (false, 0) }
+            // Can't use a non-integer to index array
+            if n % 1. != 0. { return (false, 0) }
+
+            let idx = n.clone() as usize;
+            if idx >= arr.len() { return (false, 0) }
+
+            return (true, arr[idx])
+        }
+
         (false, 0)
     }
 
