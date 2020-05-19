@@ -26,7 +26,7 @@ it silently.
  - Tracing garbage collector
  - Rust/Python-like `if` syntax
 
-## Examples
+## Examples
 
 **Hello world:**
 
