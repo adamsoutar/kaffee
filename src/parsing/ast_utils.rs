@@ -17,7 +17,8 @@ pub enum ASTNode {
     ReturnStatement(Box<ASTNode>),
     WhileLoop(WhileProperties),
     ContinueStatement,
-    BreakStatement
+    BreakStatement,
+    ArrayLiteral(Vec<ASTNode>)
 }
 
 #[derive(Clone, PartialEq)]

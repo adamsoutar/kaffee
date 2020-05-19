@@ -24,6 +24,13 @@ impl Parser {
                 self.expect_punctuation(')');
                 return exp;
             }
+
+            // Array literal
+            if pnc == '[' {
+                let exp = self.parse_array_literal();
+                self.expect_punctuation(']');
+                return exp;
+            }
         }
 
         match t {
@@ -116,6 +123,10 @@ impl Parser {
         panic!("Unsupported syntax")
     }
 
+    fn parse_array_literal (&mut self) -> ASTNode {
+        ASTNode::ArrayLiteral(self.parse_delimited('[', ',', ']', false))
+    }
+
     fn parse_for_loop (&mut self) -> ASTNode {
         // These are actually transformed into while loops by the parser
         // NOTE: This does lead to quite a few unnecessary scopes
@@ -190,7 +201,7 @@ impl Parser {
             name = self.ident_as_string(name_ident);
         }
 
-        let args = self.parse_delimited('(', ',', ')')
+        let args = self.parse_delimited('(', ',', ')', true)
             .iter().map(|x| self.ident_as_string(x)).collect();
 
         let body_block = self.parse_block_statement(true, true);
@@ -280,8 +291,8 @@ impl Parser {
         }
     }
 
-    fn parse_delimited (&mut self, start: char, delim: char, end: char) -> Vec<ASTNode> {
-        self.expect_punctuation(start);
+    fn parse_delimited (&mut self, start: char, delim: char, end: char, expect_puncs: bool) -> Vec<ASTNode> {
+        if expect_puncs { self.expect_punctuation(start) }
 
         let mut args = vec![];
         loop {
@@ -298,7 +309,7 @@ impl Parser {
             self.tokens.read();
         }
 
-        self.expect_punctuation(end);
+        if expect_puncs { self.expect_punctuation(end) }
         return args;
     }
 
@@ -370,7 +381,7 @@ impl Parser {
 
     fn might_be_call (&mut self, node: ASTNode) -> (bool, ASTNode) {
         if self.is_next_punctuation('(') {
-            let args = self.parse_delimited('(', ',', ')');
+            let args = self.parse_delimited('(', ',', ')', true);
             return (true, ASTNode::FunctionCall(CallProperties {
                 callee: Box::new(node),
                 args

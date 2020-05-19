@@ -153,6 +153,12 @@ pub fn print_ast_node (node: &ASTNode, depth: i32) {
         },
         ASTNode::ContinueStatement => {
             print_at_depth(String::from("Continue statement"), depth)
+        },
+        ASTNode::ArrayLiteral(items) => {
+            print_at_depth(format!("Array (len {}):", items.len()), depth);
+            for i in items {
+                print_ast_node(i, depth + 1)
+            }
         }
     }
 }
