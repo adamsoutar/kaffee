@@ -31,6 +31,7 @@ pub struct WhileProperties {
 pub struct FunctionDefinitionProperties {
     pub name: String,
     pub args: Vec<String>,
+    // TODO: Make this a normal Box<ASTNode>
     pub body: Vec<ASTNode>
 }
 
