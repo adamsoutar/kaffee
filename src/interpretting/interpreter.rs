@@ -69,7 +69,6 @@ impl Interpreter {
                     // If we eval a sub-block and it returns, we need to return, too
                     let (bt, kv) = self.eval_node(n);
                     if bt != BreakType::None {
-                        // We still need to GC collect if we return early
                         self.vars.pop_scope();
                         return (bt, kv)
                     }

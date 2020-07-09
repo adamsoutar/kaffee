@@ -6,16 +6,9 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        let nums = [1, 2, 3, 4]
-
-        fn stickOn(a, n) {
-            return append(a, n)
-        }
-        nums = stickOn(nums, 5)
-
-        for let i = 0; i < len(nums); i += 1 {
-            println(nums[i])
-        }
+        println(\"What's your name?\")
+        let name = input()
+        println(\"Your name is \" + name + \", that's a nice name.\")
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
