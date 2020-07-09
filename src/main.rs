@@ -8,7 +8,7 @@ fn main() {
     let code = String::from("
         let nums = [1, 2, 3, 4]
 
-        function stickOn(a, n) {
+        fn stickOn(a, n) {
             return append(a, n)
         }
         nums = stickOn(nums, 5)

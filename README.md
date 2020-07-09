@@ -25,6 +25,7 @@ it silently.
  - More predictable boolean coercion - `null` is the only value which is falsy (besides `false`)
  - Tracing garbage collector
  - Rust/Python-like `if` syntax
+ - Rust-like `fn` syntax
 
 ## Examples
 
@@ -55,7 +56,7 @@ for let i = 0 i < 5 i++ println(i)
 
 **Recursive factorial:**
 ```js
-function factorial(n) {
+fn factorial(n) {
   if n < 2 return n
   return n * factorial(n - 1)
 }
@@ -68,9 +69,9 @@ Objects can contain functions, functions can return objects, new keys
 can be created with assignment.
 
 ```js
-function myFunc () {
+fn myFunc () {
   return {
-    subFunc: function () {
+    subFunc: fn () {
       println("I'm a first-class function")
     }
   }
