@@ -56,7 +56,7 @@ impl Parser {
         // without being statements
         if let Token::Keyword(kw) = &t {
             match &kw[..] {
-                "function" => {
+                "fn" => {
                     return self.parse_function_definition()
                 },
                 _ => {}
