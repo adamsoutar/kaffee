@@ -6,7 +6,7 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        function stringy (n) {
+        fn stringy (n) {
             let out = \"\"
             if n % 3 == 0 out = \"Fizz\"
             if n % 5 == 0 out += \"Buzz\"
@@ -14,7 +14,7 @@ fn main() {
             println(out)
         }
 
-        function fizzbuzz (x) {
+        fn fizzbuzz (x) {
             for let i = 1 i < x i += 1 stringy(i)
         }
 
