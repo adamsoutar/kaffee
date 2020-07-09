@@ -30,6 +30,18 @@ fn native_len(args: Vec<KaffeeValue>, _: &mut Variables) -> KaffeeValue {
     } as f64)
 }
 
+fn native_append(args: Vec<KaffeeValue>, vars: &mut Variables) -> KaffeeValue {
+    let mut arr = match &args[0] {
+        KaffeeValue::Array(itms) => itms.clone(),
+        _ => panic!("Append's first arg should be an array")
+    };
+
+    let idx = vars.alloc_value(args[1].clone(), false);
+    arr.push(idx);
+
+    KaffeeValue::Array(arr)
+}
+
 pub fn get_std_lib_mappings () -> Vec<NativeMapping> {
     vec![
         NativeMapping {
@@ -46,6 +58,11 @@ pub fn get_std_lib_mappings () -> Vec<NativeMapping> {
             name: String::from("len"),
             arg_count: 1,
             func: native_len
+        },
+        NativeMapping {
+            name: String::from("append"),
+            arg_count: 2,
+            func: native_append
         }
     ]
 }

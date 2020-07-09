@@ -6,19 +6,16 @@ use parsing::printer::print_ast;
 
 fn main() {
     let code = String::from("
-        fn stringy (n) {
-            let out = \"\"
-            if n % 3 == 0 out = \"Fizz\"
-            if n % 5 == 0 out += \"Buzz\"
-            if out == \"\" out = stringify(n)
-            println(out)
-        }
+        let nums = [1, 2, 3, 4]
 
-        fn fizzbuzz (x) {
-            for let i = 1 i < x i += 1 stringy(i)
+        function stickOn(a, n) {
+            return append(a, n)
         }
+        nums = stickOn(nums, 5)
 
-        fizzbuzz(100)
+        for let i = 0; i < len(nums); i += 1 {
+            println(nums[i])
+        }
     ");
     let mut interp = interpreter::new(code);
     print_ast(&interp.ast);
