@@ -71,7 +71,6 @@ impl Interpreter {
                     if bt != BreakType::None {
                         // We still need to GC collect if we return early
                         self.vars.pop_scope();
-                        self.gc_collect();
                         return (bt, kv)
                     }
                 }
@@ -183,7 +182,8 @@ impl Interpreter {
 
         self.vars.pop_scope();
         // This collects the argument variables
-        self.gc_collect();
+        // But breaks returned objects
+        // self.gc_collect();
 
         ret_val
     }
